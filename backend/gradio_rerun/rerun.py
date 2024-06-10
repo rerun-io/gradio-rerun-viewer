@@ -31,10 +31,16 @@ class Rerun(Component, StreamingOutput):
 
     data_model = RerunData
 
+    def get_config(self) -> dict[str, Any]:
+        config = super().get_config()
+        config["foo"] = self.foo
+        return config
+
     def __init__(
         self,
         value: list[Path | str] | Path | str | bytes | Callable | None = None,
         *,
+        foo: str = "bar",
         label: str | None = None,
         every: float | None = None,
         show_label: bool | None = None,
@@ -64,6 +70,7 @@ class Rerun(Component, StreamingOutput):
             elem_classes: An optional list of strings that are assigned as the classes of this component in the HTML DOM. Can be used for targeting CSS styles.
             render: If False, component will not render be rendered in the Blocks context. Should be used if the intention is to assign event listeners now but render the component later.
         """
+        self.foo = foo
         self.height = height
         self.streaming = streaming
         super().__init__(

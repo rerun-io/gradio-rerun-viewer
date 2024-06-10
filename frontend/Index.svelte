@@ -21,6 +21,7 @@
     is_stream: boolean;
   }
 
+  export let foo: string | null = null;
   export let elem_id = "";
   export let elem_classes: string[] = [];
   export let visible = true;
@@ -113,6 +114,7 @@
     {scale}
     {min_width}
   >
+    <h3>{foo}</h3>
     <StatusTracker
       autoscroll={gradio.autoscroll}
       i18n={gradio.i18n}
