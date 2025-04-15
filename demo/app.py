@@ -112,7 +112,7 @@ def register_keypoint(
     current_timeline: str,
     current_time: float,
     request: gr.Request,
-    evt: SelectionChange,
+    change: SelectionChange,
 ):
     if active_recording_id == "":
         return
@@ -120,13 +120,15 @@ def register_keypoint(
     if current_timeline != "iteration":
         return
 
+    evt = change.payload
+
     # We can only log a keypoint if the user selected only a single item.
     if len(evt.items) != 1:
         return
     item = evt.items[0]
 
     # If the selected item isn't an entity, or we don't have its position, then bail out.
-    if item.kind != "entity" or item.position is None:
+    if item.type != "entity" or item.position is None:
         return
 
     # Now we can produce a valid keypoint.
@@ -150,11 +152,11 @@ def register_keypoint(
 
 
 def track_current_time(evt: TimeUpdate):
-    return evt.time
+    return evt.payload.time
 
 
 def track_current_timeline_and_time(evt: TimelineChange):
-    return evt.timeline, evt.time
+    return evt.payload.timeline, evt.payload.time
 
 
 # However, if you have a workflow that creates an RRD file instead, you can still send it

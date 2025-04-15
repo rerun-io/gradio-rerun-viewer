@@ -161,13 +161,11 @@
       setup_panels();
     });
     rr.on("fullscreen", (on) => rr.toggle_panel_overrides(!on));
-    rr.on("selectionchange", (items) =>
-      gradio.dispatch("selection_change", items)
-    );
-    rr.on("timeupdate", (time) => gradio.dispatch("time_update", time));
-    rr.on("timelinechange", (timeline, time) =>
-      gradio.dispatch("timeline_change", { timeline, time })
-    );
+
+    (rr as any)._on_raw_event((event: string) => {
+      const { type } = JSON.parse(event);
+      gradio.dispatch(type, event);
+    });
 
     rr.start(undefined, ref, {
       hide_welcome_screen: true,

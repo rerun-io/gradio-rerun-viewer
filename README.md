@@ -23,14 +23,24 @@ pip install gradio_rerun
 ## Usage
 
 ```python
+"""
+Demonstrates integrating Rerun visualization with Gradio.
+
+Provides example implementations of data streaming, keypoint annotation, and dynamic
+visualization across multiple Gradio tabs using Rerun's recording and visualization capabilities.
+"""
+
 import math
-import uuid
-import time
-import tempfile
 import os
+import tempfile
+import time
+import uuid
 
 import cv2
 import gradio as gr
+import rerun as rr
+import rerun.blueprint as rrb
+from color_grid import build_color_grid
 from gradio_rerun import Rerun
 from gradio_rerun.events import (
     SelectionChange,
@@ -38,19 +48,12 @@ from gradio_rerun.events import (
     TimeUpdate,
 )
 
-import rerun as rr
-import rerun.blueprint as rrb
-
-from color_grid import build_color_grid
-
 
 # Whenever we need a recording, we construct a new recording stream.
 # As long as the app and recording IDs remain the same, the data
 # will be merged by the Viewer.
 def get_recording(recording_id: str) -> rr.RecordingStream:
-    return rr.RecordingStream(
-        application_id="rerun_example_gradio", recording_id=recording_id
-    )
+    return rr.RecordingStream(application_id="rerun_example_gradio", recording_id=recording_id)
 
 
 # A task can directly log to a binary stream, which is routed to the embedded viewer.
@@ -107,9 +110,7 @@ Keypoint = tuple[float, float]
 keypoints_per_session_per_sequence_index: dict[str, dict[int, list[Keypoint]]] = {}
 
 
-def get_keypoints_for_user_at_sequence_index(
-    request: gr.Request, sequence: int
-) -> list[Keypoint]:
+def get_keypoints_for_user_at_sequence_index(request: gr.Request, sequence: int) -> list[Keypoint]:
     per_sequence = keypoints_per_session_per_sequence_index[request.session_hash]
     if sequence not in per_sequence:
         per_sequence[sequence] = []
@@ -117,16 +118,17 @@ def get_keypoints_for_user_at_sequence_index(
     return per_sequence[sequence]
 
 
-def initialize_instance(request: gr.Request):
+def initialize_instance(request: gr.Request) -> None:
     keypoints_per_session_per_sequence_index[request.session_hash] = {}
 
 
-def cleanup_instance(request: gr.Request):
+def cleanup_instance(request: gr.Request) -> None:
     if request.session_hash in keypoints_per_session_per_sequence_index:
         del keypoints_per_session_per_sequence_index[request.session_hash]
 
 
-# In this function, the `request` and `evt` parameters will be automatically injected by Gradio when this event listener is fired.
+# In this function, the `request` and `evt` parameters will be automatically injected by Gradio when this
+# event listener is fired.
 #
 # `SelectionChange` is a subclass of `EventData`: https://www.gradio.app/docs/gradio/eventdata
 # `gr.Request`: https://www.gradio.app/main/docs/gradio/request
@@ -135,7 +137,7 @@ def register_keypoint(
     current_timeline: str,
     current_time: float,
     request: gr.Request,
-    evt: SelectionChange,
+    change: SelectionChange,
 ):
     if active_recording_id == "":
         return
@@ -143,13 +145,15 @@ def register_keypoint(
     if current_timeline != "iteration":
         return
 
+    evt = change.payload
+
     # We can only log a keypoint if the user selected only a single item.
     if len(evt.items) != 1:
         return
     item = evt.items[0]
 
     # If the selected item isn't an entity, or we don't have its position, then bail out.
-    if item.kind != "entity" or item.position is None:
+    if item.type != "entity" or item.position is None:
         return
 
     # Now we can produce a valid keypoint.
@@ -173,11 +177,11 @@ def register_keypoint(
 
 
 def track_current_time(evt: TimeUpdate):
-    return evt.time
+    return evt.payload.time
 
 
 def track_current_timeline_and_time(evt: TimelineChange):
-    return evt.timeline, evt.time
+    return evt.payload.timeline, evt.payload.time
 
 
 # However, if you have a workflow that creates an RRD file instead, you can still send it
@@ -209,7 +213,7 @@ def create_cube_rrd(x, y, z, pending_cleanup):
     return temp.name
 
 
-def cleanup_cube_rrds(pending_cleanup):
+def cleanup_cube_rrds(pending_cleanup: list[str]) -> None:
     for f in pending_cleanup:
         os.unlink(f)
 
@@ -238,11 +242,13 @@ with gr.Blocks() as demo:
         current_timeline = gr.State("")
         current_time = gr.State(0.0)
 
-        # When registering the event listeners, we pass the `recording_id` in as input in order to create a recording stream
-        # using that id.
+        # When registering the event listeners, we pass the `recording_id` in as input in order to create
+        # a recording stream using that id.
         stream_blur.click(
             # Using the `viewer` as an output allows us to stream data to it by yielding bytes from the callback.
-            streaming_repeated_blur, inputs=[recording_id, img], outputs=[viewer]
+            streaming_repeated_blur,
+            inputs=[recording_id, img],
+            outputs=[viewer],
         )
         viewer.selection_change(
             register_keypoint,
@@ -250,23 +256,13 @@ with gr.Blocks() as demo:
             outputs=[viewer],
         )
         viewer.time_update(track_current_time, outputs=[current_time])
-        viewer.timeline_change(
-            track_current_timeline_and_time, outputs=[current_timeline, current_time]
-        )
+        viewer.timeline_change(track_current_timeline_and_time, outputs=[current_timeline, current_time])
     with gr.Tab("Dynamic RRD"):
-        pending_cleanup = gr.State(
-            [], time_to_live=10, delete_callback=cleanup_cube_rrds
-        )
+        pending_cleanup = gr.State([], time_to_live=10, delete_callback=cleanup_cube_rrds)
         with gr.Row():
-            x_count = gr.Number(
-                minimum=1, maximum=10, value=5, precision=0, label="X Count"
-            )
-            y_count = gr.Number(
-                minimum=1, maximum=10, value=5, precision=0, label="Y Count"
-            )
-            z_count = gr.Number(
-                minimum=1, maximum=10, value=5, precision=0, label="Z Count"
-            )
+            x_count = gr.Number(minimum=1, maximum=10, value=5, precision=0, label="X Count")
+            y_count = gr.Number(minimum=1, maximum=10, value=5, precision=0, label="Y Count")
+            z_count = gr.Number(minimum=1, maximum=10, value=5, precision=0, label="Z Count")
         with gr.Row():
             create_rrd = gr.Button("Create RRD")
         with gr.Row():
@@ -334,26 +330,17 @@ if __name__ == "__main__":
 <td align="left" style="width: 25%;">
 
 ```python
-typing.Union[
-    list[pathlib.Path | str],
-    pathlib.Path,
-    str,
-    bytes,
-    typing.Callable,
-    NoneType,
-][
-    list[pathlib.Path | str],
-    pathlib.Path,
-    str,
-    bytes,
-    Callable,
-    None,
-]
+list[pathlib.Path | str]
+    | pathlib.Path
+    | str
+    | bytes
+    | collections.abc.Callable
+    | None
 ```
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">Takes a singular or list of RRD resources. Each RRD can be a Path, a string containing a url, or a binary blob containing encoded RRD data. If callable, the function will be called whenever the app loads to set the initial value of the component.</td>
+<td align="left">Takes a singular or list of RRD resources. Each RRD can be a Path, a string containing a url,</td>
 </tr>
 
 <tr>
@@ -366,7 +353,7 @@ str | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">The label for this component. Appears above the component and is also used as the header if there are a table of examples for this component. If None and used in a `gr.Interface`, the label will be the name of the parameter this component is assigned to.</td>
+<td align="left">The label for this component. Appears above the component and is also used as the header if there</td>
 </tr>
 
 <tr>
@@ -379,7 +366,7 @@ float | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">If `value` is a callable, run the function 'every' number of seconds while the client connection is open. Has no effect otherwise. Queue must be enabled. The event can be accessed (e.g. to cancel it) via this component's .load_event attribute.</td>
+<td align="left">If `value` is a callable, run the function 'every' number of seconds while the client connection is</td>
 </tr>
 
 <tr>
@@ -405,7 +392,7 @@ bool
 
 </td>
 <td align="left"><code>True</code></td>
-<td align="left">If True, will place the component in a container - providing some extra padding around the border.</td>
+<td align="left">If True, will place the component in a container providing some extra padding around the border.</td>
 </tr>
 
 <tr>
@@ -418,7 +405,7 @@ int | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">relative size compared to adjacent Components. For example if Components A and B are in a Row, and A has scale=2, and B has scale=1, A will be twice as wide as B. Should be an integer. scale applies in Rows, and to top-level Components in Blocks where fill_height=True.</td>
+<td align="left">relative size compared to adjacent Components.</td>
 </tr>
 
 <tr>
@@ -431,7 +418,7 @@ int
 
 </td>
 <td align="left"><code>160</code></td>
-<td align="left">minimum pixel width, will wrap if not sufficient screen space to satisfy this value. If a certain scale value results in this Component being narrower than min_width, the min_width parameter will be respected first.</td>
+<td align="left">minimum pixel width, will wrap if not sufficient screen space to satisfy this value.</td>
 </tr>
 
 <tr>
@@ -444,7 +431,7 @@ int | str
 
 </td>
 <td align="left"><code>640</code></td>
-<td align="left">height of component in pixels. If a string is provided, will be interpreted as a CSS value. If None, will be set to 640px.</td>
+<td align="left">height of component in pixels. If a string is provided, will be interpreted as a CSS value.</td>
 </tr>
 
 <tr>
@@ -470,7 +457,7 @@ bool
 
 </td>
 <td align="left"><code>False</code></td>
-<td align="left">If True, the data should be incrementally yielded from the source as `bytes` returned by calling `.read()` on an `rr.binary_stream()`</td>
+<td align="left">If True, the data should be incrementally yielded from the source as `bytes` returned by</td>
 </tr>
 
 <tr>
@@ -483,7 +470,7 @@ str | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">An optional string that is assigned as the id of this component in the HTML DOM. Can be used for targeting CSS styles.</td>
+<td align="left">An optional string that is assigned as the id of this component in the HTML DOM.</td>
 </tr>
 
 <tr>
@@ -496,7 +483,7 @@ list[str] | str | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">An optional list of strings that are assigned as the classes of this component in the HTML DOM. Can be used for targeting CSS styles.</td>
+<td align="left">An optional list of strings that are assigned as the classes of this component in</td>
 </tr>
 
 <tr>
@@ -509,7 +496,7 @@ bool
 
 </td>
 <td align="left"><code>True</code></td>
-<td align="left">If False, component will not render be rendered in the Blocks context. Should be used if the intention is to assign event listeners now but render the component later.</td>
+<td align="left">If False, component will not render be rendered in the Blocks context.</td>
 </tr>
 
 <tr>
@@ -522,7 +509,7 @@ dict[str, typing.Any] | None
 
 </td>
 <td align="left"><code>None</code></td>
-<td align="left">Force viewer panels to a specific state. Any panels set cannot be toggled by the user in the viewer. Panel names are "top", "blueprint", "selection", and "time". States are "hidden", "collapsed", and "expanded".</td>
+<td align="left">Force viewer panels to a specific state.</td>
 </tr>
 </tbody></table>
 
@@ -531,9 +518,11 @@ dict[str, typing.Any] | None
 
 | name | description |
 |:-----|:------------|
-| `selection_change` | Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`. |
+| `play` | Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play` |
+| `pause` | Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause` |
 | `time_update` | Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`. |
 | `timeline_change` | Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`. |
+| `selection_change` | Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`. |
 
 
 
@@ -546,8 +535,8 @@ The impact on the users predict function varies depending on whether the compone
 
 The code snippet below is accurate in cases where the component is used as both an input and an output.
 
-- **As output:** Is passed, a RerunData object.
-- **As input:** Should return, expects.
+- **As output:** Is passed, a `RerunData` object.
+- **As input:** Should return, the value to send over to the Rerun viewer on the front-end.
 
  ```python
  def predict(
@@ -560,5 +549,5 @@ The code snippet below is accurate in cases where the component is used as both 
 ## `RerunData`
 ```python
 class RerunData(GradioRootModel):
-    root: list[FileData | str]
+    root: Sequence[FileData | Path | str]
 ```
