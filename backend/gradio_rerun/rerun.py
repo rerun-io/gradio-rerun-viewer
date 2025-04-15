@@ -19,7 +19,7 @@ class RerunData(GradioRootModel):
     `FileData` is used for data served from Gradio, while `str` is used for URLs Rerun will open from a remote server.
     """
 
-    root: Sequence[FileData | Path | str]
+    root: Sequence[FileData | Path | str] | None
 
 
 class Rerun(Component, StreamingOutput):
@@ -142,7 +142,7 @@ class Rerun(Component, StreamingOutput):
 
         """
         if value is None:
-            return RerunData(root=[])
+            return RerunData(root=None)
 
         if isinstance(value, bytes):
             if self.streaming:
