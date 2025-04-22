@@ -29,7 +29,7 @@ classifiers = [
   'Topic :: Scientific/Engineering :: Visualization',
 ]
 
-dependencies = ["gradio>=5.22.0", "rerun-sdk>=0.22.1", "opencv-python"]
+dependencies = ["gradio>=5.22.0", "rerun-sdk>=0.23.0rc3", "opencv-python"]
 
 [project.optional-dependencies]
 dev = ["build", "twine", "opencv-python>=4.10.0"]
