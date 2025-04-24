@@ -406,4 +406,4 @@ class RerunData(GradioRootModel):
 
 """)
 
-demo.launch()
+demo.launch(ssr_mode=False)
