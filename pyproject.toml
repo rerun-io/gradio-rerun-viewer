@@ -29,7 +29,12 @@ classifiers = [
   'Topic :: Scientific/Engineering :: Visualization',
 ]
 
-dependencies = ["gradio>=5.22.0", "rerun-sdk>=0.23.1", "opencv-python"]
+dependencies = [
+    "gradio>=5.22.0",
+ "rerun-sdk>=0.23.1",
+ "opencv-python",
+ "twine>=6.1.0",
+]
 
 [project.optional-dependencies]
 dev = ["build", "twine", "opencv-python>=4.10.0"]
@@ -114,4 +119,9 @@ combine-as-imports = true
 
 
 [dependency-groups]
-dev = ["build>=1.2.2.post1", "mypy>=1.15.0", "opencv-python>=4.10.0.84"]
+dev = [
+    "build>=1.2.2.post1",
+ "mypy>=1.15.0",
+ "opencv-python>=4.10.0.84",
+ "twine>=5.1.1",
+]
