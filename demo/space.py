@@ -316,7 +316,7 @@ with gr.Blocks() as demo:
 
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(ssr_mode=False)
 
 ```
 """, elem_classes=["md-custom"], header_links=True)
@@ -406,4 +406,4 @@ class RerunData(GradioRootModel):
 
 """)
 
-demo.launch(ssr_mode=False)
+demo.launch()
