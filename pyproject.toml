@@ -1,11 +1,11 @@
 [project]
 name = "gradio_rerun"
-version = "0.23.1"
+version = "0.23.2"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
-license = "apache-2.0"
+license = { text = "MIT OR Apache-2.0" }
 requires-python = ">=3.10"
-authors = [{ name = "Radamés Ajna", email = "radamajna@gmail.com" }]
+authors = [{ name = "Radamés Ajna", email = "radamajna@gmail.com" }, { name = "rerun.io", email = "opensource@rerun.io" }]
 keywords = [
   "gradio-custom-component",
   "multimodal data",
@@ -30,10 +30,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "gradio>=5.22.0",
- "rerun-sdk>=0.23.1",
- "opencv-python",
- "twine>=6.1.0",
+  "gradio>=5.22.0",
+  "rerun-sdk>=0.23.2",
+  "opencv-python",
+  "twine>=6.1.0",
 ]
 
 [project.optional-dependencies]
@@ -120,8 +120,8 @@ combine-as-imports = true
 
 [dependency-groups]
 dev = [
-    "build>=1.2.2.post1",
- "mypy>=1.15.0",
- "opencv-python>=4.10.0.84",
- "twine>=5.1.1",
+  "build>=1.2.2.post1",
+  "mypy>=1.15.0",
+  "opencv-python>=4.10.0.84",
+  "twine>=6.1.0",
 ]

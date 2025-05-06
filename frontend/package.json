@@ -14,7 +14,7 @@
     "@gradio/upload": "0.16.3",
     "@gradio/utils": "0.10.1",
     "@gradio/wasm": "0.18.1",
-    "@rerun-io/web-viewer": ">=0.23.1",
+    "@rerun-io/web-viewer": ">=0.23.2",
     "cropperjs": "^1.5.12",
     "lazy-brush": "^1.0.1",
     "resize-observer-polyfill": "^1.5.1",
@@ -32,5 +32,6 @@
     ".": "./Index.svelte",
     "./example": "./Example.svelte",
     "./package.json": "./package.json"
-  }
+  },
+  "packageManager": "pnpm@9.9.0"
 }
