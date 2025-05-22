@@ -57,5 +57,5 @@ This means we might add breaking changes in each new release.
         git clone git@hf.co:spaces/rerun/gradio-rerun-viewer
         ```
 
-    2. Update the package version in the `requirements.txt`
-    3. Commit and push the changes
+    2. Update the package version in the `requirements.txt`.
+    3. Commit and push the changes.

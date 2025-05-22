@@ -5,7 +5,10 @@ description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
 requires-python = ">=3.10"
-authors = [{ name = "Radamés Ajna", email = "radamajna@gmail.com" }, { name = "rerun.io", email = "opensource@rerun.io" }]
+authors = [
+  { name = "Radamés Ajna", email = "radamajna@gmail.com" },
+  { name = "rerun.io", email = "opensource@rerun.io" },
+]
 keywords = [
   "gradio-custom-component",
   "multimodal data",
