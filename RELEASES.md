@@ -49,7 +49,7 @@ This means we might add breaking changes in each new release.
 
 6. Update the example space on Huggingface
 
-    Gradio does not currently have an option to pick a specific repo id when publishing, so the space has to be updated manually.
+    Gradio does not currently have an option to pick a specific repo id when publishing, so the space has to be updated manually (gradio-app/gradio#11240).
 
     1. Check out [the Huggingface space](https://huggingface.co/spaces/rerun/gradio-rerun-viewer) using git:
 
