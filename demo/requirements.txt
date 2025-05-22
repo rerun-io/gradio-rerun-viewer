@@ -1,2 +1,2 @@
-gradio_rerun
+gradio_rerun>=0.23.2
 opencv-python

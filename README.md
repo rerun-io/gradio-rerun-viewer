@@ -324,8 +324,8 @@ if __name__ == "__main__":
 <td align="left" style="width: 25%;">
 
 ```python
-list[pathlib._local.Path | str]
-    | pathlib._local.Path
+list[pathlib.Path | str]
+    | pathlib.Path
     | str
     | bytes
     | collections.abc.Callable
@@ -535,10 +535,7 @@ The code snippet below is accurate in cases where the component is used as both 
  ```python
  def predict(
      value: RerunData | None
- ) -> list[pathlib._local.Path | str]
-    | pathlib._local.Path
-    | str
-    | bytes:
+ ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes:
      return value
  ```
  
