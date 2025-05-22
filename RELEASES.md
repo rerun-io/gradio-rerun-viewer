@@ -4,11 +4,11 @@ This document describes the current release and versioning strategy.
 
 ## Release cadence
 
-New releases of the Rerun Gradio integration are released alongside new Rerun versions, approximately once every month.
+New releases of the Rerun Gradio integration are published alongside Rerun releases, typically once per month.
 
 ## Library versioning
 
-We use semantic versioning. All versions are increased in sync with Rerun (e.g. `0.22.0`, `0.23.0`, ...).
+The project follows semantic versioning with versions synchronized to Rerun releases (e.g. `0.22.0`, `0.23.0`, ...).
 
 This means we might add breaking changes in each new release.
 
@@ -22,7 +22,7 @@ This means we might add breaking changes in each new release.
     - `release-0.x.y` for final releases and their release candidates.
     - `release-0.x.y-alpha.N` where `N` is incremented from the previous alpha, or defaulted to `1` if no previous alpha exists.
 
-    Note that `release-0.x` is invalid. Always specify the `y`, even if it is `0`, e.g. `release-0.15.0` instead of `release-0.15.`
+    > Note that `release-0.x` is invalid. Always specify the `y`, even if it is `0`, e.g. `release-0.15.0` instead of `release-0.15.`
 
 3. Increment Rerun version and package version.
 
@@ -45,7 +45,7 @@ This means we might add breaking changes in each new release.
     gradio cc publish --upload-pypi --no-upload-demo --no-upload-source
     ```
 
-    When prompted for PyPI credentials log in using a token ([here's how](https://pypi.org/help/#apitoken)).
+    When prompted for PyPI credentials log in using a token ([token setup guide](https://pypi.org/help/#apitoken)).
 
 6. Update the example space on Huggingface
 
