@@ -510,12 +510,12 @@ dict[str, typing.Any] | None
 
 ### Events
 
-| name               | description                                                                                                         |
-| :----------------- | :------------------------------------------------------------------------------------------------------------------ |
-| `play`             | Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`          |
-| `pause`            | Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`        |
-| `time_update`      | Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`.               |
-| `timeline_change`  | Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`. |
+| name | description |
+|:-----|:------------|
+| `play` | Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play` |
+| `pause` | Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause` |
+| `time_update` | Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`. |
+| `timeline_change` | Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`. |
 | `selection_change` | Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`. |
 
 
