@@ -33,11 +33,15 @@ This means we might add breaking changes in each new release.
 
     Ensure both versions match exactly, then set the library version (in `pyproject.toml`) to the same value.
 
-4. Build the Gradio component to update the docs and example
+4. Update `pnpm-lock.yaml`.
+
+    Run `pnpm install` in the `frontend` directory to update the lockfile.
+
+5. Build the Gradio component to update the docs and example
 
     Run `gradio cc build` to build the package and ensure there are no errors. This will generate updated documentation and example code in `demo/space.py`.
 
-5. Publish the Gradio component
+6. Publish the Gradio component
 
     Publish the Gradio component and PyPI package using the following command:
 
@@ -47,7 +51,7 @@ This means we might add breaking changes in each new release.
 
     When prompted for PyPI credentials log in using a token ([token setup guide](https://pypi.org/help/#apitoken)).
 
-6. Update the example space on Huggingface
+7. Update the example space on Huggingface
 
     Gradio does not currently have an option to pick a specific repo id when publishing, so the space has to be updated manually (gradio-app/gradio#11240).
 
