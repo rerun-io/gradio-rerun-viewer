@@ -148,7 +148,6 @@
 
     // Binary data, but not streamed
     // TODO(jan, gijs): is this still a valid case?
-    console.log("Opening non-streaming URL", value.url);
     rr.open(value.url);
   }
 
