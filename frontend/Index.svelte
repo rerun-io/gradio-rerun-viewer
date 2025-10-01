@@ -18,7 +18,8 @@
   import { StatusTracker } from "@gradio/statustracker";
   import type { FileData } from "@gradio/client";
   import type { LoadingStatus } from "@gradio/statustracker";
-  import type { SelectionItem } from "@rerun-io/web-viewer";
+
+  import type { SelectionChangeItem } from "@rerun-io/web-viewer";
 
   interface BinaryStream {
     url: string;
@@ -44,7 +45,7 @@
     upload: never;
     clear: never;
     clear_status: LoadingStatus;
-    selection_change: SelectionItem[];
+    selection_change: SelectionChangeItem[];
     time_update: number;
     timeline_change: { timeline: string; time: number };
   }>;
@@ -119,7 +120,16 @@
       for (const file of value) {
         if (typeof file !== "string") {
           if (file.url) {
-            rr.open(file.url);
+            // fetch the file as a blob and pass a blob URL to the viewer
+            let resp = await fetch(file.url);
+            if (!resp.ok) {
+              console.error("Failed to fetch file:", file.url);
+              continue;
+            }
+
+            let bytes = await resp.bytes();
+
+            channel.send_rrd(bytes);
           }
         } else {
           rr.open(file);
@@ -138,6 +148,7 @@
 
     // Binary data, but not streamed
     // TODO(jan, gijs): is this still a valid case?
+    console.log("Opening non-streaming URL", value.url);
     rr.open(value.url);
   }
 
