@@ -1,22 +1,22 @@
 {
   "name": "gradio_rerun",
-  "version": "0.23.1",
+  "version": "0.26.0-alpha.1",
   "description": "Gradio UI packages",
   "type": "module",
   "author": "",
   "license": "ISC",
   "private": false,
   "dependencies": {
-    "@gradio/atoms": "0.14.0",
-    "@gradio/client": "1.13.1",
-    "@gradio/icons": "0.12.0",
-    "@gradio/statustracker": "0.10.5",
-    "@gradio/upload": "0.16.3",
-    "@gradio/utils": "0.10.1",
+    "@gradio/atoms": "0.18.1",
+    "@gradio/client": "1.19.0",
+    "@gradio/icons": "0.14.0",
+    "@gradio/statustracker": "0.11.0",
+    "@gradio/upload": "0.17.1",
+    "@gradio/utils": "0.10.2",
     "@gradio/wasm": "0.18.1",
-    "@rerun-io/web-viewer": ">=0.25.1",
-    "cropperjs": "^1.5.12",
-    "lazy-brush": "^1.0.1",
+    "@rerun-io/web-viewer": "0.26.0-alpha.1",
+    "cropperjs": "^2.0.1",
+    "lazy-brush": "^2.0.2",
     "resize-observer-polyfill": "^1.5.1",
     "vite-plugin-wasm": "^3.3.0"
   },
@@ -33,5 +33,5 @@
     "./example": "./Example.svelte",
     "./package.json": "./package.json"
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@10.17.1"
 }

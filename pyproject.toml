@@ -1,6 +1,6 @@
 [project]
 name = "gradio_rerun"
-version = "0.25.1"
+version = "0.26.0a1"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
@@ -33,8 +33,8 @@ classifiers = [
 ]
 
 dependencies = [
-  "gradio>=5.22.0",
-  "rerun-sdk>=0.25.1",
+  "gradio==5.47.2",
+  "rerun-sdk>=0.26.0a1",
   "opencv-python",
   "twine>=6.1.0",
 ]
@@ -61,7 +61,11 @@ requires = [
 build-backend = "hatchling.build"
 
 [tool.hatch.build]
-artifacts = ["/backend/gradio_rerun/templates", "*.pyi"]
+artifacts = [
+  "/backend/gradio_rerun/templates",
+  "*.pyi",
+  "/.venv/lib/python3.11/site-packages/gradio_rerun/templates",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["/backend/gradio_rerun"]
