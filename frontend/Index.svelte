@@ -120,7 +120,7 @@
       for (const file of value) {
         if (typeof file !== "string") {
           if (file.url) {
-            // fetch the file as a blob and pass a blob URL to the viewer
+            // fetch the file as a blob and send it to the viewer, over the channel
             let resp = await fetch(file.url);
             if (!resp.ok) {
               console.error("Failed to fetch file:", file.url);
