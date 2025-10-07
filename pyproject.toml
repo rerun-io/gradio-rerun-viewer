@@ -1,6 +1,6 @@
 [project]
 name = "gradio_rerun"
-version = "0.26.0a1"
+version = "0.26.0-alpha.1"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "gradio==5.47.2",
+  "gradio",
   "rerun-sdk>=0.26.0a1",
   "opencv-python",
   "twine>=6.1.0",
@@ -123,6 +123,9 @@ line-length = 120
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+
+[tool.uv.sources]
+gradio = { git = "https://github.com/gradio-app/gradio", rev = "01ce7944e5427bc1571bfff8101b8d5310daeba9" }
 
 
 [dependency-groups]
