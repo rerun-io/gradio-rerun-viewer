@@ -131,7 +131,7 @@ gradio = { git = "https://github.com/gradio-app/gradio", rev = "01ce7944e5427bc1
 [dependency-groups]
 dev = [
   "build>=1.2.2.post1",
-  "mypy>=1.15.0",
+  "mypy>=1.18.2",
   "opencv-python>=4.10.0.84",
   "twine>=6.1.0",
 ]

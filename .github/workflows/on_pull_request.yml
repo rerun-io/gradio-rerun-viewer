@@ -1,0 +1,25 @@
+# Jobs that only run for developers on the `rerun` team.
+# We have to ensure that these jobs _only_ run for PRs inside the `rerun-io` organization
+# this is done using the following check, added to every job:
+#     if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+# (unfortunately this does not work on the trigger or the entire `jobs` category)
+
+name: Pull-Request
+
+on:
+    pull_request:
+        types:
+            - opened
+            - synchronize
+
+permissions: write-all
+
+# These jobs use fairly short names as they are a prefix in the display hierarchy
+jobs:
+    python-checks:
+        name: "Python Checks"
+        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+        uses: ./.github/workflows/reusable_checks_python.yml
+        with:
+            CONCURRENCY: pr-${{ github.event.pull_request.number }}
+        secrets: inherit

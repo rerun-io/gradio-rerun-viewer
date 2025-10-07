@@ -26,11 +26,26 @@ class Rerun(Component, StreamingOutput):
     """Creates a Rerun viewer component that can be used to display the output of a Rerun stream."""
 
     EVENTS: list[EventListener | str] = [
-        EventListener("play", doc="Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`"),
-        EventListener("pause", doc="Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`"),
-        EventListener("time_update", doc="Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`."),
-        EventListener("timeline_change", doc="Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`."),
-        EventListener("selection_change", doc="Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`."),
+        EventListener(
+            "play",
+            doc="Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`",
+        ),
+        EventListener(
+            "pause",
+            doc="Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`",
+        ),
+        EventListener(
+            "time_update",
+            doc="Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`.",
+        ),
+        EventListener(
+            "timeline_change",
+            doc="Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`.",
+        ),
+        EventListener(
+            "selection_change",
+            doc="Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`.",
+        ),
     ]
 
     data_model = RerunData

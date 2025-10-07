@@ -1,0 +1,64 @@
+name: "Python Checks: Lints & Format"
+
+on:
+  workflow_call:
+    inputs:
+      CONCURRENCY:
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ inputs.CONCURRENCY }}-checks_python
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+  contents: "read"
+  id-token: "write"
+
+jobs:
+  # ---------------------------------------------------------------------------
+
+  py-lints:
+    name: Python lints (ruff, mypy, …)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Lint Python
+        run: uv run ruff check
+
+      - name: Typecheck Python
+        run: uv run mypy backend demo
+
+  py-fmt:
+    name: Python format (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Format Python
+        run: uv run ruff format --check

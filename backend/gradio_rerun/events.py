@@ -52,7 +52,6 @@ class TimeUpdate(EventData):
         self.payload: TimeUpdateEvent = event
 
 
-
 class TimelineChange(EventData):
     """Event triggered when the timeline changes in the viewer."""
 
@@ -79,5 +78,3 @@ class SelectionChange(EventData):
         event = _viewer_event_from_json_str(data)
         assert event.type == "selection_change"
         self.payload: SelectionChangeEvent = event
-
-
