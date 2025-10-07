@@ -45,7 +45,7 @@ jobs:
         run: uv run mypy backend demo
 
   py-fmt:
-    name: Python format (ruff)
+    name: Python format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
