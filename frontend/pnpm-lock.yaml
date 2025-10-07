@@ -18,8 +18,8 @@ importers:
         specifier: 0.14.0
         version: 0.14.0(svelte@4.2.20)
       '@gradio/statustracker':
-        specifier: 0.11.0
-        version: 0.11.0(svelte@4.2.20)
+        specifier: 0.11.1
+        version: 0.11.1(svelte@4.2.20)
       '@gradio/upload':
         specifier: 0.17.1
         version: 0.17.1(svelte@4.2.20)
@@ -444,11 +444,6 @@ packages:
   '@formatjs/intl-localematcher@0.2.25':
     resolution: {integrity: sha512-YmLcX70BxoSopLFdLr1Ds99NdlTI2oWoLbaUW2M406lxOIPzE1KQhRz2fPUkq34xVZQaihCoU29h0KK7An3bhA==}
 
-  '@gradio/atoms@0.17.0':
-    resolution: {integrity: sha512-IfdKBH36Hx/oWiwuwueDMXJhL+ErViCitmf0tliaWXAzpPONefGs33yUmL0PLw8a6TrXUyDVkHMiMbGvbJzK2A==}
-    peerDependencies:
-      svelte: ^4.0.0
-
   '@gradio/atoms@0.18.1':
     resolution: {integrity: sha512-gorVbzEX7CXuOR/RWmdE3bxa2kPY3FgTbughFkYWzjr/Z58ngH4mUxAV9aw1X9FEm1V57BAtCa0bgNEGgVai1A==}
     peerDependencies:
@@ -474,8 +469,8 @@ packages:
   '@gradio/sanitize@0.2.0':
     resolution: {integrity: sha512-fb8v4s/YHhCRF+4d3xTAtaW2z9G2xUJBlWpKwc0vAK7GL/eSKLtNKnWNjgkiRIHzpwT4PZEvWa7WxuTMoJgj+Q==}
 
-  '@gradio/statustracker@0.11.0':
-    resolution: {integrity: sha512-jRLYL/RmxVymQhfGURm1YnBuVMwQF+nwv1sVJJraNZcCpRPoEPERNbtmreCYQdjux3LPsuHTzk0+E0f4KORhrQ==}
+  '@gradio/statustracker@0.11.1':
+    resolution: {integrity: sha512-m9kB5a5gxRmkkZtc1N5rwFhRYiKVG9ZPCPmmqZpkfpfa4ax2WiqnlAYPucS9P3QesJzJMBgOCUKbDx4szs6XqQ==}
     peerDependencies:
       svelte: ^4.0.0
 
@@ -2939,15 +2934,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@gradio/atoms@0.17.0(svelte@4.2.20)':
-    dependencies:
-      '@gradio/icons': 0.14.0(svelte@4.2.20)
-      '@gradio/markdown-code': 0.5.2(svelte@4.2.20)
-      '@gradio/utils': 0.10.2(svelte@4.2.20)
-      svelte: 4.2.20
-    transitivePeerDependencies:
-      - supports-color
-
   '@gradio/atoms@0.18.1(svelte@4.2.20)':
     dependencies:
       '@gradio/icons': 0.14.0(svelte@4.2.20)
@@ -3028,9 +3014,9 @@ snapshots:
       amuchina: 1.0.12
       sanitize-html: 2.17.0
 
-  '@gradio/statustracker@0.11.0(svelte@4.2.20)':
+  '@gradio/statustracker@0.11.1(svelte@4.2.20)':
     dependencies:
-      '@gradio/atoms': 0.17.0(svelte@4.2.20)
+      '@gradio/atoms': 0.18.1(svelte@4.2.20)
       '@gradio/icons': 0.14.0(svelte@4.2.20)
       '@gradio/sanitize': 0.2.0
       '@gradio/utils': 0.10.2(svelte@4.2.20)

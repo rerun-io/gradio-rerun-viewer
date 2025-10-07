@@ -1,6 +1,6 @@
 
 import gradio as gr
-from app import demo as app
+from .app import demo as app
 import os
 
 _docs = {'Rerun': {'description': 'Creates a Rerun viewer component that can be used to display the output of a Rerun stream.', 'members': {'__init__': {'value': {'type': 'list[pathlib.Path | str]\n    | pathlib.Path\n    | str\n    | bytes\n    | collections.abc.Callable\n    | None', 'default': 'None', 'description': 'Takes a singular or list of RRD resources. Each RRD can be a Path, a string containing a url,'}, 'label': {'type': 'str | None', 'default': 'None', 'description': 'The label for this component. Appears above the component and is also used as the header if there'}, 'every': {'type': 'float | None', 'default': 'None', 'description': "If `value` is a callable, run the function 'every' number of seconds while the client connection is"}, 'show_label': {'type': 'bool | None', 'default': 'None', 'description': 'if True, will display label.'}, 'container': {'type': 'bool', 'default': 'True', 'description': 'If True, will place the component in a container providing some extra padding around the border.'}, 'scale': {'type': 'int | None', 'default': 'None', 'description': 'relative size compared to adjacent Components.'}, 'min_width': {'type': 'int', 'default': '160', 'description': 'minimum pixel width, will wrap if not sufficient screen space to satisfy this value.'}, 'height': {'type': 'int | str', 'default': '640', 'description': 'height of component in pixels. If a string is provided, will be interpreted as a CSS value.'}, 'visible': {'type': 'bool', 'default': 'True', 'description': 'If False, component will be hidden.'}, 'streaming': {'type': 'bool', 'default': 'False', 'description': 'If True, the data should be incrementally yielded from the source as `bytes` returned by'}, 'elem_id': {'type': 'str | None', 'default': 'None', 'description': 'An optional string that is assigned as the id of this component in the HTML DOM.'}, 'elem_classes': {'type': 'list[str] | str | None', 'default': 'None', 'description': 'An optional list of strings that are assigned as the classes of this component in'}, 'render': {'type': 'bool', 'default': 'True', 'description': 'If False, component will not render be rendered in the Blocks context.'}, 'panel_states': {'type': 'dict[str, typing.Any] | None', 'default': 'None', 'description': 'Force viewer panels to a specific state.'}}, 'postprocess': {'value': {'type': 'list[pathlib.Path | str] | pathlib.Path | str | bytes', 'description': 'The value to send over to the Rerun viewer on the front-end.'}}, 'preprocess': {'return': {'type': 'RerunData | None', 'description': 'A `RerunData` object.'}, 'value': None}}, 'events': {'play': {'type': None, 'default': None, 'description': 'Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`'}, 'pause': {'type': None, 'default': None, 'description': 'Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`'}, 'time_update': {'type': None, 'default': None, 'description': 'Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`.'}, 'timeline_change': {'type': None, 'default': None, 'description': 'Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`.'}, 'selection_change': {'type': None, 'default': None, 'description': 'Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`.'}}}, '__meta__': {'additional_interfaces': {'RerunData': {'source': 'class RerunData(GradioRootModel):\n    root: Sequence[FileData | Path | str] | None'}}, 'user_fn_refs': {'Rerun': ['RerunData']}}}
@@ -55,13 +55,14 @@ import cv2
 import gradio as gr
 import rerun as rr
 import rerun.blueprint as rrb
-from color_grid import build_color_grid
 from gradio_rerun import Rerun
 from gradio_rerun.events import (
     SelectionChange,
     TimelineChange,
     TimeUpdate,
 )
+
+from .color_grid import build_color_grid
 
 
 # Whenever we need a recording, we construct a new recording stream.

@@ -40,13 +40,14 @@ import cv2
 import gradio as gr
 import rerun as rr
 import rerun.blueprint as rrb
-from color_grid import build_color_grid
 from gradio_rerun import Rerun
 from gradio_rerun.events import (
     SelectionChange,
     TimelineChange,
     TimeUpdate,
 )
+
+from .color_grid import build_color_grid
 
 
 # Whenever we need a recording, we construct a new recording stream.

@@ -64,6 +64,7 @@ build-backend = "hatchling.build"
 artifacts = [
   "/backend/gradio_rerun/templates",
   "*.pyi",
+  "/backend/gradio_rerun/py.typed",
   "/.venv/lib/python3.11/site-packages/gradio_rerun/templates",
 ]
 
