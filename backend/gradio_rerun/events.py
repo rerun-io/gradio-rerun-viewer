@@ -6,17 +6,33 @@ from typing import Any
 
 from gradio import EventData
 from rerun.event import (
-    PlayEvent,
     PauseEvent,
-    TimeUpdateEvent,
-    TimelineChangeEvent,
+    PlayEvent,
     SelectionChangeEvent,
+    TimelineChangeEvent,
+    TimeUpdateEvent,
     _viewer_event_from_json_str,
 )
 
 
 class Play(EventData):
+    """
+    Event triggered when playback starts.
+
+    Args:
+        EventData (EventData): The base event data.
+
+    """
+
     def __init__(self, target: Any, data: Any):
+        """
+        Initialize a Play event.
+
+        Args:
+            target (Any): The object that triggered the play event.
+            data (Any): The play event data.
+
+        """
         super().__init__(target, data)
 
         event = _viewer_event_from_json_str(data)
@@ -25,7 +41,23 @@ class Play(EventData):
 
 
 class Pause(EventData):
+    """
+    Event triggered when playback is paused.
+
+    Args:
+        EventData (EventData): The base event data.
+
+    """
+
     def __init__(self, target: Any, data: Any):
+        """
+        Initialize a Pause event.
+
+        Args:
+            target (Any): The object that triggered the pause event.
+            data (Any): The pause event data.
+
+        """
         super().__init__(target, data)
 
         event = _viewer_event_from_json_str(data)
@@ -72,7 +104,23 @@ class TimelineChange(EventData):
 
 
 class SelectionChange(EventData):
+    """
+    Event triggered when the selection changes in the Viewer.
+
+    Args:
+        EventData (EventData): The base event data.
+
+    """
+
     def __init__(self, target: Any, data: Any):
+        """
+        Initialize a SelectionChange event.
+
+        Args:
+            target (Any): The object that triggered the selection change event.
+            data (Any): The selection change event data.
+
+        """
         super().__init__(target, data)
 
         event = _viewer_event_from_json_str(data)

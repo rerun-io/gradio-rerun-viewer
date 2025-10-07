@@ -28,11 +28,13 @@ class Rerun(Component, StreamingOutput):
     EVENTS: list[EventListener | str] = [
         EventListener(
             "play",
-            doc="Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`",
+            doc="Fired when timeline playback starts. Callback should accept a parameter of type "
+            "`gradio_rerun.events.Play`",
         ),
         EventListener(
             "pause",
-            doc="Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`",
+            doc="Fired when timeline pauseback starts. Callback should accept a parameter of type "
+            "`gradio_rerun.events.Pause`",
         ),
         EventListener(
             "time_update",
@@ -40,11 +42,13 @@ class Rerun(Component, StreamingOutput):
         ),
         EventListener(
             "timeline_change",
-            doc="Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`.",
+            doc="Fired when a timeline is selected. Callback should accept a parameter of type "
+            "`gradio_rerun.events.TimelineChange`.",
         ),
         EventListener(
             "selection_change",
-            doc="Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`.",
+            doc="Fired when the selection changes. Callback should accept a parameter of type "
+            "`gradio_rerun.events.SelectionChange`.",
         ),
     ]
 
