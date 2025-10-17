@@ -218,19 +218,19 @@ with gr.Blocks() as demo:
 
         # When registering the event listeners, we pass the `recording_id` in as input in order to create
         # a recording stream using that id.
-        stream_blur.click(  # type: ignore[attr-defined]
+        stream_blur.click(
             # Using the `viewer` as an output allows us to stream data to it by yielding bytes from the callback.
             streaming_repeated_blur,
             inputs=[recording_id, img],
             outputs=[viewer],
         )
-        viewer.selection_change(  # type: ignore[attr-defined]
+        viewer.selection_change(
             register_keypoint,
             inputs=[recording_id, current_timeline, current_time],
             outputs=[viewer],
         )
-        viewer.time_update(track_current_time, outputs=[current_time]) # type: ignore[attr-defined]
-        viewer.timeline_change(track_current_timeline_and_time, outputs=[current_timeline, current_time]) # type: ignore[attr-defined]
+        viewer.time_update(track_current_time, outputs=[current_time])
+        viewer.timeline_change(track_current_timeline_and_time, outputs=[current_timeline, current_time])
     with gr.Tab("Dynamic RRD"):
         pending_cleanup = gr.State([], time_to_live=10, delete_callback=cleanup_cube_rrds)
         with gr.Row():
@@ -248,7 +248,7 @@ with gr.Blocks() as demo:
                     "selection": "hidden",
                 },
             )
-        create_rrd.click(  # type: ignore[attr-defined]
+        create_rrd.click(
             create_cube_rrd,
             inputs=[x_count, y_count, z_count, pending_cleanup],
             outputs=[viewer],
@@ -275,10 +275,10 @@ with gr.Blocks() as demo:
                     "selection": "hidden",
                 },
             )
-        choose_rrd.change(lambda x: x, inputs=[choose_rrd], outputs=[viewer])  # type: ignore[attr-defined]
+        choose_rrd.change(lambda x: x, inputs=[choose_rrd], outputs=[viewer])
 
-    demo.load(initialize_instance)  # type: ignore[attr-defined]
-    demo.close(cleanup_instance)  # type: ignore[attr-defined]
+    demo.load(initialize_instance)
+    demo.close(cleanup_instance)
 
 
 if __name__ == "__main__":

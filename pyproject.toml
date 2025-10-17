@@ -126,6 +126,19 @@ line-length = 120
 combine-as-imports = true
 
 
+[tool.mypy]
+exclude = ['demo/space.py']
+warn_return_any = true
+warn_unused_configs = true
+
+
+[[tool.mypy.overrides]]
+module = "demo.app"
+# Gradio generates a lot of attributes on the Rerun component dynamically,
+# so we need to ignore attribute-defined errors here.
+disable_error_code = "attr-defined"
+
+
 [dependency-groups]
 dev = [
   "build>=1.2.2.post1",
