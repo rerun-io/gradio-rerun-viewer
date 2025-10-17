@@ -224,13 +224,13 @@ with gr.Blocks() as demo:
             inputs=[recording_id, img],
             outputs=[viewer],
         )
-        viewer.selection_change(
+        viewer.selection_change(  # type: ignore[attr-defined]
             register_keypoint,
             inputs=[recording_id, current_timeline, current_time],
             outputs=[viewer],
         )
-        viewer.time_update(track_current_time, outputs=[current_time])
-        viewer.timeline_change(track_current_timeline_and_time, outputs=[current_timeline, current_time])
+        viewer.time_update(track_current_time, outputs=[current_time]) # type: ignore[attr-defined]
+        viewer.timeline_change(track_current_timeline_and_time, outputs=[current_timeline, current_time]) # type: ignore[attr-defined]
     with gr.Tab("Dynamic RRD"):
         pending_cleanup = gr.State([], time_to_live=10, delete_callback=cleanup_cube_rrds)
         with gr.Row():

@@ -42,7 +42,7 @@ jobs:
         run: uv run ruff check
 
       - name: Typecheck Python
-        run: uv run mypy backend demo
+        run: uv run mypy backend demo --exclude-gitignore
 
   py-fmt:
     name: Python format

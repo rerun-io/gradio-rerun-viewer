@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
+from abc import abstractmethod
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from gradio import processing_utils
+from gradio.blocks import Block
 from gradio.components.base import Component, StreamingOutput
 from gradio.data_classes import FileData, GradioRootModel, MediaStreamChunk
-from gradio.events import EventListener
+from gradio.events import Dependency, EventListener
+
+if TYPE_CHECKING:
+    from gradio.components import Timer
+    from gradio.components.base import Component
 
 
 class RerunData(GradioRootModel):
