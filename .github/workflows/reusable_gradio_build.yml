@@ -56,3 +56,15 @@ jobs:
 
             - name: "Build gradio component"
               run: uv run gradio cc build
+
+            - name: Fail if generated files changed
+              run: |
+                  # Show what changed (if anything) for easier debugging
+                  git status --porcelain
+                  # Fail if there are any modified, deleted, or untracked files
+                  if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+                      echo "::error::Generated files are out of date. Run 'uv run gradio cc build' locally and commit the results."
+                      # Print a short diff for context
+                      git --no-pager diff | sed -n '1,200p'
+                      exit 1
+                  fi
