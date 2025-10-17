@@ -1,6 +1,6 @@
 
 import gradio as gr
-from .app import demo as app
+from app import demo as app
 import os
 
 _docs = {'Rerun': {'description': 'Creates a Rerun viewer component that can be used to display the output of a Rerun stream.', 'members': {'__init__': {'value': {'type': 'list[pathlib.Path | str]\n    | pathlib.Path\n    | str\n    | bytes\n    | collections.abc.Callable\n    | None', 'default': 'None', 'description': 'Takes a singular or list of RRD resources. Each RRD can be a Path, a string containing a url,'}, 'label': {'type': 'str | None', 'default': 'None', 'description': 'The label for this component. Appears above the component and is also used as the header if there'}, 'every': {'type': 'float | None', 'default': 'None', 'description': "If `value` is a callable, run the function 'every' number of seconds while the client connection is"}, 'show_label': {'type': 'bool | None', 'default': 'None', 'description': 'if True, will display label.'}, 'container': {'type': 'bool', 'default': 'True', 'description': 'If True, will place the component in a container providing some extra padding around the border.'}, 'scale': {'type': 'int | None', 'default': 'None', 'description': 'relative size compared to adjacent Components.'}, 'min_width': {'type': 'int', 'default': '160', 'description': 'minimum pixel width, will wrap if not sufficient screen space to satisfy this value.'}, 'height': {'type': 'int | str', 'default': '640', 'description': 'height of component in pixels. If a string is provided, will be interpreted as a CSS value.'}, 'visible': {'type': 'bool', 'default': 'True', 'description': 'If False, component will be hidden.'}, 'streaming': {'type': 'bool', 'default': 'False', 'description': 'If True, the data should be incrementally yielded from the source as `bytes` returned by'}, 'elem_id': {'type': 'str | None', 'default': 'None', 'description': 'An optional string that is assigned as the id of this component in the HTML DOM.'}, 'elem_classes': {'type': 'list[str] | str | None', 'default': 'None', 'description': 'An optional list of strings that are assigned as the classes of this component in'}, 'render': {'type': 'bool', 'default': 'True', 'description': 'If False, component will not render be rendered in the Blocks context.'}, 'panel_states': {'type': 'dict[str, typing.Any] | None', 'default': 'None', 'description': 'Force viewer panels to a specific state.'}}, 'postprocess': {'value': {'type': 'list[pathlib.Path | str] | pathlib.Path | str | bytes', 'description': 'The value to send over to the Rerun viewer on the front-end.'}}, 'preprocess': {'return': {'type': 'RerunData | None', 'description': 'A `RerunData` object.'}, 'value': None}}, 'events': {'play': {'type': None, 'default': None, 'description': 'Fired when timeline playback starts. Callback should accept a parameter of type `gradio_rerun.events.Play`'}, 'pause': {'type': None, 'default': None, 'description': 'Fired when timeline pauseback starts. Callback should accept a parameter of type `gradio_rerun.events.Pause`'}, 'time_update': {'type': None, 'default': None, 'description': 'Fired when time updates. Callback should accept a parameter of type `gradio_rerun.events.TimeUpdate`.'}, 'timeline_change': {'type': None, 'default': None, 'description': 'Fired when a timeline is selected. Callback should accept a parameter of type `gradio_rerun.events.TimelineChange`.'}, 'selection_change': {'type': None, 'default': None, 'description': 'Fired when the selection changes. Callback should accept a parameter of type `gradio_rerun.events.SelectionChange`.'}}}, '__meta__': {'additional_interfaces': {'RerunData': {'source': 'class RerunData(GradioRootModel):\n    root: Sequence[FileData | Path | str] | None'}}, 'user_fn_refs': {'Rerun': ['RerunData']}}}
@@ -80,7 +80,7 @@ def get_recording(recording_id: str) -> rr.RecordingStream:
 def streaming_repeated_blur(recording_id: str, img):
     # Here we get a recording using the provided recording id.
     rec = get_recording(recording_id)
-    stream = rec.binary_stream()
+    stream = rec.binary_stream()  # type: ignore
 
     if img is None:
         raise gr.Error("Must provide an image to blur.")
@@ -123,6 +123,8 @@ keypoints_per_session_per_sequence_index: dict[str, dict[int, list[Keypoint]]] =
 
 
 def get_keypoints_for_user_at_sequence_index(request: gr.Request, sequence: int) -> list[Keypoint]:
+    if request.session_hash is None:
+        raise ValueError("Session hash is None")
     per_sequence = keypoints_per_session_per_sequence_index[request.session_hash]
     if sequence not in per_sequence:
         per_sequence[sequence] = []
@@ -131,11 +133,13 @@ def get_keypoints_for_user_at_sequence_index(request: gr.Request, sequence: int)
 
 
 def initialize_instance(request: gr.Request) -> None:
+    if request.session_hash is None:
+        raise ValueError("Session hash is None")
     keypoints_per_session_per_sequence_index[request.session_hash] = {}
 
 
 def cleanup_instance(request: gr.Request) -> None:
-    if request.session_hash in keypoints_per_session_per_sequence_index:
+    if request.session_hash is not None and request.session_hash in keypoints_per_session_per_sequence_index:
         del keypoints_per_session_per_sequence_index[request.session_hash]
 
 
@@ -170,7 +174,7 @@ def register_keypoint(
 
     # Now we can produce a valid keypoint.
     rec = get_recording(active_recording_id)
-    stream = rec.binary_stream()
+    stream = rec.binary_stream()  # type: ignore
 
     # We round `current_time` toward 0, because that gives us the sequence index
     # that the user is currently looking at, due to the Viewer's latest-at semantics.
@@ -178,7 +182,7 @@ def register_keypoint(
 
     # We keep track of the keypoints per sequence index for each user manually.
     keypoints = get_keypoints_for_user_at_sequence_index(request, index)
-    keypoints.append(item.position[0:2])
+    keypoints.append((item.position[0], item.position[1]))
 
     rec.set_time("iteration", sequence=index)
     rec.log(f"{item.entity_path}/keypoint", rr.Points2D(keypoints, radii=2))
@@ -254,7 +258,7 @@ with gr.Blocks() as demo:
 
         # When registering the event listeners, we pass the `recording_id` in as input in order to create
         # a recording stream using that id.
-        stream_blur.click(
+        stream_blur.click(  # type: ignore[attr-defined]
             # Using the `viewer` as an output allows us to stream data to it by yielding bytes from the callback.
             streaming_repeated_blur,
             inputs=[recording_id, img],
@@ -284,7 +288,7 @@ with gr.Blocks() as demo:
                     "selection": "hidden",
                 },
             )
-        create_rrd.click(
+        create_rrd.click(  # type: ignore[attr-defined]
             create_cube_rrd,
             inputs=[x_count, y_count, z_count, pending_cleanup],
             outputs=[viewer],
@@ -297,9 +301,9 @@ with gr.Blocks() as demo:
             choose_rrd = gr.Dropdown(
                 label="RRD",
                 choices=[
-                    f"{rr.bindings.get_app_url()}/examples/arkit_scenes.rrd",
-                    f"{rr.bindings.get_app_url()}/examples/dna.rrd",
-                    f"{rr.bindings.get_app_url()}/examples/plots.rrd",
+                    f"{rr.bindings.get_app_url()}/examples/arkit_scenes.rrd",  # type: ignore[private-use]
+                    f"{rr.bindings.get_app_url()}/examples/dna.rrd",  # type: ignore[private-use]
+                    f"{rr.bindings.get_app_url()}/examples/plots.rrd",  # type: ignore[private-use]
                 ],
             )
         with gr.Row():
@@ -311,9 +315,10 @@ with gr.Blocks() as demo:
                     "selection": "hidden",
                 },
             )
-        choose_rrd.change(lambda x: x, inputs=[choose_rrd], outputs=[viewer])
-    demo.load(initialize_instance)
-    demo.close(cleanup_instance)
+        choose_rrd.change(lambda x: x, inputs=[choose_rrd], outputs=[viewer])  # type: ignore[attr-defined]
+
+    demo.load(initialize_instance)  # type: ignore[attr-defined]
+    demo.close(cleanup_instance)  # type: ignore[attr-defined]
 
 
 if __name__ == "__main__":

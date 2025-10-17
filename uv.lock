@@ -419,8 +419,8 @@ wheels = [
 
 [[package]]
 name = "gradio"
-version = "5.49.0"
-source = { git = "https://github.com/gradio-app/gradio?rev=01ce7944e5427bc1571bfff8101b8d5310daeba9#01ce7944e5427bc1571bfff8101b8d5310daeba9" }
+version = "5.49.1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "anyio" },
@@ -451,6 +451,10 @@ dependencies = [
     { name = "typer" },
     { name = "typing-extensions" },
     { name = "uvicorn" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/67/17b3969a686f204dfb8f06bd34d1423bcba1df8a2f3674f115ca427188b7/gradio-5.49.1.tar.gz", hash = "sha256:c06faa324ae06c3892c8b4b4e73c706c4520d380f6b9e52a3c02dc53a7627ba9", size = 73784504, upload-time = "2025-10-08T20:18:40.4Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8d/95/1c25fbcabfa201ab79b016c8716a4ac0f846121d4bbfd2136ffb6d87f31e/gradio-5.49.1-py3-none-any.whl", hash = "sha256:1b19369387801a26a6ba7fd2f74d46c5b0e2ac9ddef14f24ddc0d11fb19421b7", size = 63523840, upload-time = "2025-10-08T20:18:34.585Z" },
 ]
 
 [[package]]
@@ -499,7 +503,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "build", marker = "extra == 'dev'" },
-    { name = "gradio", git = "https://github.com/gradio-app/gradio?rev=01ce7944e5427bc1571bfff8101b8d5310daeba9" },
+    { name = "gradio", specifier = ">=5.49.1" },
     { name = "opencv-python" },
     { name = "opencv-python", marker = "extra == 'dev'", specifier = ">=4.10.0" },
     { name = "rerun-sdk", specifier = ">=0.26.0a1" },
