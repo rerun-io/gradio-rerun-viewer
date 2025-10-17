@@ -57,8 +57,8 @@ jobs:
           python-version-file: ".python-version"
       - uses: astral-sh/setup-uv@v6
 
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: uv sync --dev
 
-      - name: Format Python
+      - name: "Format Python"
         run: uv run ruff format --check

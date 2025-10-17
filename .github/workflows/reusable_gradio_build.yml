@@ -1,0 +1,56 @@
+name: "Build Gradio component"
+
+on:
+    workflow_call:
+        inputs:
+            CONCURRENCY:
+                required: true
+                type: string
+
+concurrency:
+    group: ${{ inputs.CONCURRENCY }}-checks_python
+    cancel-in-progress: true
+
+defaults:
+    run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+    contents: "read"
+    id-token: "write"
+
+jobs:
+    # ---------------------------------------------------------------------------
+
+    gradio-build:
+        name: Build Gradio component
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+            - name: "Set up Python"
+              uses: actions/setup-python@v5
+              with:
+                  python-version-file: ".python-version"
+            - uses: astral-sh/setup-uv@v6
+
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+                  run_install: false
+
+            - name: "Set up Node.js"
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - name: "Install Python dependencies"
+              run: uv sync --dev
+
+            - name: "Install frontend dependencies"
+              run: pnpm install --frozen-lockfile
+
+            - name: "Build gradio component"
+              run: uv run gradio cc build

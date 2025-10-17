@@ -23,3 +23,10 @@ jobs:
         with:
             CONCURRENCY: pr-${{ github.event.pull_request.number }}
         secrets: inherit
+    gradio-build:
+        name: "Gradio Build"
+        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+        uses: ./.github/workflows/reusable_gradio_build.yml
+        with:
+            CONCURRENCY: pr-${{ github.event.pull_request.number }}
+        secrets: inherit
