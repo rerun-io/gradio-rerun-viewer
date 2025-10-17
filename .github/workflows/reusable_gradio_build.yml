@@ -1,4 +1,4 @@
-name: "Build component"
+name: "Build Gradio component"
 
 on:
     workflow_call:
@@ -23,7 +23,7 @@ jobs:
     # ---------------------------------------------------------------------------
 
     gradio-build:
-        name: Build Gradio component
+        name: Build component
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -51,6 +51,7 @@ jobs:
               run: uv sync --dev
 
             - name: "Install frontend dependencies"
+              working-directory: "./frontend"
               run: pnpm install --frozen-lockfile
 
             - name: "Build gradio component"
