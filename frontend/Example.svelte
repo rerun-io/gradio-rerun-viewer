@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type { FileData } from "@gradio/client";
+	import type { FileData } from '@gradio/client';
 
 	export let value: null | FileData;
-	export let type: "gallery" | "table";
+	export let type: 'gallery' | 'table';
 	export let selected = false;
 </script>
 
 {#if value}
 	<div
 		class="container"
-		class:table={type === "table"}
-		class:gallery={type === "gallery"}
+		class:table={type === 'table'}
+		class:gallery={type === 'gallery'}
 		class:selected
 	>
 		<img src={value.url} alt="" />

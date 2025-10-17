@@ -1,37 +1,54 @@
 {
-  "name": "gradio_rerun",
-  "version": "0.26.0-alpha.1",
-  "description": "Gradio UI packages",
-  "type": "module",
-  "author": "",
-  "license": "ISC",
-  "private": false,
-  "dependencies": {
-    "@gradio/atoms": "0.18.1",
-    "@gradio/client": "1.19.0",
-    "@gradio/icons": "0.14.0",
-    "@gradio/statustracker": "0.11.1",
-    "@gradio/upload": "0.17.1",
-    "@gradio/utils": "0.10.2",
-    "@gradio/wasm": "0.18.1",
-    "@rerun-io/web-viewer": "0.26.0-alpha.1",
-    "cropperjs": "^2.0.1",
-    "lazy-brush": "^2.0.2",
-    "resize-observer-polyfill": "^1.5.1",
-    "vite-plugin-wasm": "^3.3.0"
-  },
-  "devDependencies": {
-    "@gradio/preview": "0.8.3",
-    "@tailwindcss/vite": "^4.0.0-alpha.14",
-    "tailwindcss": "^4.0.0-alpha.14",
-    "vite": "^5.2.9"
-  },
-  "main_changeset": true,
-  "main": "./Index.svelte",
-  "exports": {
-    ".": "./Index.svelte",
-    "./example": "./Example.svelte",
-    "./package.json": "./package.json"
-  },
-  "packageManager": "pnpm@10.17.1"
+	"name": "gradio_rerun",
+	"version": "0.26.0-alpha.1",
+	"description": "Gradio UI packages",
+	"type": "module",
+	"author": "",
+	"license": "ISC",
+	"private": false,
+	"dependencies": {
+		"@gradio/atoms": "0.18.1",
+		"@gradio/client": "1.19.0",
+		"@gradio/icons": "0.14.0",
+		"@gradio/statustracker": "0.11.1",
+		"@gradio/upload": "0.17.1",
+		"@gradio/utils": "0.10.2",
+		"@gradio/wasm": "0.18.1",
+		"@rerun-io/web-viewer": "0.26.0-alpha.1",
+		"cropperjs": "^2.0.1",
+		"lazy-brush": "^2.0.2",
+		"resize-observer-polyfill": "^1.5.1",
+		"vite-plugin-wasm": "^3.3.0"
+	},
+	"devDependencies": {
+		"@eslint/compat": "^1.4.0",
+		"@eslint/js": "^9.36.0",
+		"@gradio/preview": "0.8.3",
+		"@tailwindcss/vite": "^4.0.0-alpha.14",
+		"@types/node": "^22",
+		"eslint": "^9.36.0",
+		"eslint-config-js": "^5.0.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.4",
+		"eslint-plugin-svelte": "^3.12.4",
+		"globals": "^16.4.0",
+		"jiti": "^2.6.1",
+		"prettier": "^3.6.2",
+		"prettier-plugin-svelte": "^3.4.0",
+		"tailwindcss": "^4.0.0-alpha.14",
+		"typescript-eslint": "^8.44.1",
+		"vite": "^5.2.9"
+	},
+	"main_changeset": true,
+	"main": "./Index.svelte",
+	"exports": {
+		".": "./Index.svelte",
+		"./example": "./Example.svelte",
+		"./package.json": "./package.json"
+	},
+	"packageManager": "pnpm@10.17.1",
+	"scripts": {
+		"lint": "eslint . && prettier --check .",
+		"format": "prettier --write ."
+	}
 }
