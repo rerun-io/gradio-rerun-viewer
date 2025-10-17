@@ -22,7 +22,10 @@ from gradio_rerun.events import (
     TimeUpdate,
 )
 
-from .color_grid import build_color_grid
+try:
+    from .color_grid import build_color_grid
+except ImportError:
+    from color_grid import build_color_grid
 
 
 # Whenever we need a recording, we construct a new recording stream.
