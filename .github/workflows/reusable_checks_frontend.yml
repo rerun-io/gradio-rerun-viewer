@@ -24,6 +24,10 @@ jobs:
     name: Lints (eslint, prettier, …)
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: "./frontend/package.json"
@@ -48,6 +52,10 @@ jobs:
     name: Format
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
+
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: "./frontend/package.json"
