@@ -26,6 +26,7 @@ jobs:
     steps:
       - uses: pnpm/action-setup@v4
         with:
+          package_json_file: "./frontend/package.json"
           version: 10
           run_install: false
 
@@ -50,6 +51,7 @@ jobs:
     steps:
       - uses: pnpm/action-setup@v4
         with:
+          package_json_file: "./frontend/package.json"
           version: 10
           run_install: false
 
