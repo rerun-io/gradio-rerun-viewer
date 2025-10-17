@@ -25,7 +25,7 @@ from gradio_rerun.events import (
 try:
     from .color_grid import build_color_grid
 except ImportError:
-    from color_grid import build_color_grid
+    from color_grid import build_color_grid # type: ignore[no-redef,import-not-found]
 
 
 # Whenever we need a recording, we construct a new recording stream.
