@@ -20,10 +20,8 @@ permissions:
   id-token: "write"
 
 jobs:
-  # ---------------------------------------------------------------------------
-
   frontend-lints:
-    name: Frontend lints (eslint, prettier, …)
+    name: Lints (eslint, prettier, …)
     runs-on: ubuntu-latest
     steps:
       - uses: pnpm/action-setup@v4
@@ -47,7 +45,7 @@ jobs:
         run: pnpm lint
 
   frontend-fmt:
-    name: Frontend format
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: pnpm/action-setup@v4

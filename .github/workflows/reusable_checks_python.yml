@@ -20,10 +20,8 @@ permissions:
   id-token: "write"
 
 jobs:
-  # ---------------------------------------------------------------------------
-
   py-lints:
-    name: Python lints (ruff, mypy, …)
+    name: Lints (ruff, mypy, …)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +43,7 @@ jobs:
         run: uv run mypy backend demo --exclude-gitignore
 
   py-fmt:
-    name: Python format
+    name: Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
