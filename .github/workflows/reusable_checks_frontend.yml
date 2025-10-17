@@ -1,0 +1,71 @@
+name: "Frontend Checks: Lints & Format"
+
+on:
+  workflow_call:
+    inputs:
+      CONCURRENCY:
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ inputs.CONCURRENCY }}-checks_frontend
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+  contents: "read"
+  id-token: "write"
+
+jobs:
+  # ---------------------------------------------------------------------------
+
+  frontend-lints:
+    name: Frontend lints (eslint, prettier, …)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: "Set up Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: "./pnpm-lock.yaml"
+
+      - name: "Install frontend dependencies"
+        working-directory: "./frontend"
+        run: pnpm install --frozen-lockfile
+
+      - name: "Lint frontend"
+        working-directory: "./frontend"
+        run: pnpm lint
+
+  frontend-fmt:
+    name: Frontend format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: "Set up Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: "./pnpm-lock.yaml"
+
+      - name: "Install frontend dependencies"
+        working-directory: "./frontend"
+        run: pnpm install --frozen-lockfile
+
+      - name: "Format frontend"
+        working-directory: "./frontend"
+        run: pnpm format-check

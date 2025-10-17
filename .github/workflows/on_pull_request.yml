@@ -23,6 +23,13 @@ jobs:
         with:
             CONCURRENCY: pr-${{ github.event.pull_request.number }}
         secrets: inherit
+    frontend-checks:
+        name: "Frontend Checks"
+        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+        uses: ./.github/workflows/reusable_checks_frontend.yml
+        with:
+            CONCURRENCY: pr-${{ github.event.pull_request.number }}
+        secrets: inherit
     gradio-build:
         name: "Gradio"
         if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
