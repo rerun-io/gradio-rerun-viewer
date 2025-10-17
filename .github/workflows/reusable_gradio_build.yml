@@ -1,4 +1,4 @@
-name: "Build Gradio component"
+name: "Build component"
 
 on:
     workflow_call:
@@ -45,6 +45,7 @@ jobs:
               with:
                   node-version: 20
                   cache: "pnpm"
+                  cache-dependency-path: "./frontend/pnpm-lock.yaml"
 
             - name: "Install Python dependencies"
               run: uv sync --dev
