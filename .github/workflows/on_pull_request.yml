@@ -17,21 +17,21 @@ permissions: write-all
 # These jobs use fairly short names as they are a prefix in the display hierarchy
 jobs:
     python-checks:
-        name: "Python Checks"
+        name: Python Checks
         if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
         uses: ./.github/workflows/reusable_checks_python.yml
         with:
             CONCURRENCY: pr-${{ github.event.pull_request.number }}
         secrets: inherit
     frontend-checks:
-        name: "Frontend Checks"
+        name: Frontend Checks
         if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
         uses: ./.github/workflows/reusable_checks_frontend.yml
         with:
             CONCURRENCY: pr-${{ github.event.pull_request.number }}
         secrets: inherit
     gradio-build:
-        name: "Gradio"
+        name: Gradio
         if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
         uses: ./.github/workflows/reusable_gradio_build.yml
         with:

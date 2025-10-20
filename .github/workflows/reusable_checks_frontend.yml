@@ -33,18 +33,18 @@ jobs:
           package_json_file: "./frontend/package.json"
           run_install: false
 
-      - name: "Set up Node.js"
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
           cache-dependency-path: "./frontend/pnpm-lock.yaml"
 
-      - name: "Install frontend dependencies"
+      - name: Install frontend dependencies
         working-directory: "./frontend"
         run: pnpm install --frozen-lockfile
 
-      - name: "Lint frontend"
+      - name: Lint frontend
         working-directory: "./frontend"
         run: pnpm lint
 
@@ -61,17 +61,17 @@ jobs:
           package_json_file: "./frontend/package.json"
           run_install: false
 
-      - name: "Set up Node.js"
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
           cache-dependency-path: "./frontend/pnpm-lock.yaml"
 
-      - name: "Install frontend dependencies"
+      - name: Install frontend dependencies
         working-directory: "./frontend"
         run: pnpm install --frozen-lockfile
 
-      - name: "Format frontend"
+      - name: Format frontend
         working-directory: "./frontend"
         run: pnpm format-check
