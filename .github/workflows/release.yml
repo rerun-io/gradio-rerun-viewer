@@ -74,10 +74,16 @@ jobs:
                       uv run python scripts/ci/version.py version --exact $release_version
                   fi
 
-                  # For RC releases, bump the prerelease version
-                  if [ "${{ inputs.release-type }}" = "rc" ]; then
+                  # Handle release type specific versioning
+                  if [ "${{ inputs.release-type }}" = "alpha" ]; then
+                      echo "Bumping alpha version"
+                      uv run python scripts/ci/version.py version --bump prerelease --pre-id=alpha
+                  elif [ "${{ inputs.release-type }}" = "rc" ]; then
                       echo "Bumping RC version"
                       uv run python scripts/ci/version.py version --bump prerelease --pre-id=rc
+                  elif [ "${{ inputs.release-type }}" = "final" ]; then
+                      echo "Setting final version"
+                      uv run python scripts/ci/version.py version --exact $release_version
                   fi
 
                   # Get the final version after all updates
