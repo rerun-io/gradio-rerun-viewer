@@ -31,7 +31,6 @@ defaults:
 permissions: write-all
 
 jobs:
-    # NOTE: When updating this job, also remember to update `post-release-version-bump`.
     version:
         name: "Versioning"
         runs-on: ubuntu-latest
@@ -86,20 +85,59 @@ jobs:
                   git push
                   echo "version_bump_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-    python-checks:
-        name: Python Checks
+    py-lints:
+        name: Python Lints (ruff, mypy, …)
         needs: version
-        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
-        uses: ./.github/workflows/reusable_checks_python.yml
-        with:
-            CONCURRENCY: pr-${{ github.event.pull_request.number }}
-        secrets: inherit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-    frontend-checks:
-        name: Frontend Checks
+            - name: Setup Python & uv
+              uses: ./.github/actions/setup-python-uv
+
+            - name: Lint Python
+              run: uv run ruff check
+
+            - name: Typecheck Python
+              run: uv run mypy backend demo --exclude-gitignore
+
+    py-fmt:
+        name: Python Format
         needs: version
-        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
-        uses: ./.github/workflows/reusable_checks_frontend.yml
-        with:
-            CONCURRENCY: pr-${{ github.event.pull_request.number }}
-        secrets: inherit
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Python & uv
+              uses: ./.github/actions/setup-python-uv
+
+            - name: Format Python
+              run: uv run ruff format --check
+
+    frontend-lints:
+        name: Frontend Lints (eslint, prettier, …)
+        needs: version
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js & pnpm
+              uses: ./.github/actions/setup-nodejs-pnpm
+
+            - name: Lint frontend
+              working-directory: "./frontend"
+              run: pnpm lint
+
+    frontend-fmt:
+        name: Frontend Format
+        needs: version
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node.js & pnpm
+              uses: ./.github/actions/setup-nodejs-pnpm
+
+            - name: Format frontend
+              working-directory: "./frontend"
+              run: pnpm format-check
