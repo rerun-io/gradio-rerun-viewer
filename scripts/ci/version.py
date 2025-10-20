@@ -169,7 +169,7 @@ def update_pyproject_version(version: str, pyproject_path: Path = Path("pyprojec
         print(f"ERROR: {pyproject_path} not found.", file=sys.stderr)
         sys.exit(1)
 
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
     lines = content.splitlines(keepends=True)
 
     updated = False
