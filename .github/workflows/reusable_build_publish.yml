@@ -44,3 +44,12 @@ jobs:
                   name: gradio_rerun-${{ inputs.PEP440_VERSION }}-py3-none-any.whl
                   path: dist/gradio_rerun-${{ inputs.PEP440_VERSION }}-py3-none-any.whl
                   if-no-files-found: error
+
+            # - name: Publish Python package
+            #   run: |
+            #       uv run gradio cc publish \
+            #         --no-upload-source \
+            #         --no-upload-demo \
+            #         --upload-pypi \
+            #         --pypi-username __token__ \
+            #         --pypi-password ${{ secrets.PYPI_API_TOKEN }}

@@ -57,12 +57,44 @@ jobs:
             - name: Get and validate version
               id: versioning
               run: |
-                  output=$(uv run python scripts/ci/version.py get-version)
-                  echo "$output"
-                  version=$(echo "$output" | grep "Release version:" | cut -d' ' -f3)
-                  pep440_version=$(echo "$output" | grep "PEP 440 version:" | cut -d' ' -f4)
+                  # Extract the target final version from branch name (e.g., prepare-release-0.1.0-alpha.1 -> 0.1.0)
+                  release_version_output=$(uv run python scripts/ci/version.py get-version --from git --finalize)
+                  echo "$release_version_output"
+                  release_version=$(echo "$release_version_output" | grep "Release version:" | cut -d' ' -f3)
+                  echo "Target release version from branch: $release_version"
+
+                  # Get current version from file (finalized)
+                  current_finalized_output=$(uv run python scripts/ci/version.py get-version --from file --finalize)
+                  current_finalized=$(echo "$current_finalized_output" | grep "Release version:" | cut -d' ' -f3)
+                  echo "Current finalized version from file: $current_finalized"
+
+                  # If current finalized version doesn't match target, update to target
+                  if [ "$current_finalized" != "$release_version" ]; then
+                      echo "Updating version to $release_version"
+                      uv run python scripts/ci/version.py version --exact $release_version
+                  fi
+
+                  # For RC releases, bump the prerelease version
+                  if [ "${{ inputs.release-type }}" = "rc" ]; then
+                      echo "Bumping RC version"
+                      uv run python scripts/ci/version.py version --bump prerelease --pre-id=rc
+                  fi
+
+                  # Get the final version after all updates
+                  final_output=$(uv run python scripts/ci/version.py get-version --from file)
+                  echo "$final_output"
+                  version=$(echo "$final_output" | grep "Release version:" | cut -d' ' -f3)
+                  pep440_version=$(echo "$final_output" | grep "PEP 440 version:" | cut -d' ' -f4)
+
+                  # Store previous version for re-entrancy check
+                  echo "previous=$current_finalized" >> $GITHUB_OUTPUT
                   echo "current=$version" >> $GITHUB_OUTPUT
                   echo "pep440_version=$pep440_version" >> $GITHUB_OUTPUT
+                  echo "final=$release_version" >> $GITHUB_OUTPUT
+
+                  # For wheel versioning
+                  py_wheel_version=$(echo "$pep440_version" | tr -d '-')
+                  echo "py_wheel_version=$py_wheel_version" >> $GITHUB_OUTPUT
 
             - name: Update Rerun versions
               run: |
@@ -85,10 +117,18 @@ jobs:
               run: |
                   git config user.name "rerun-bot"
                   git config user.email "bot@rerun.io"
-                  git add pyproject.toml frontend/package.json
-                  git commit -am "Bump versions to ${{ steps.versioning.outputs.current }}"
-                  git push
-                  echo "version_bump_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+                  # Check if there are any changes to commit
+                  git add -A
+                  if git diff --cached --quiet; then
+                      echo "No version changes to commit"
+                      echo "version_bump_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "Committing version changes"
+                      git commit -m "Bump versions to ${{ steps.versioning.outputs.current }}"
+                      git push
+                      echo "version_bump_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+                  fi
 
     py-lints:
         name: Python Lints (ruff, mypy, …)
@@ -140,3 +180,48 @@ jobs:
             PEP440_VERSION: ${{ needs.version.outputs.pep440_version }}
 
         secrets: inherit
+
+    github-release:
+        name: Create GitHub Release
+        needs:
+            - version
+            - build-publish
+        runs-on: ubuntu-latest
+        # Only create GitHub releases for RC and final releases, not alpha
+        if: inputs.release-type == 'rc' || inputs.release-type == 'final'
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ needs.version.outputs.version_bump_commit_sha }}
+
+            - name: Create GitHub Release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  version="${{ needs.version.outputs.current }}"
+                  final_version="${{ needs.version.outputs.final }}"
+                  release_type="${{ inputs.release-type }}"
+
+                  # Determine release parameters
+                  if [ "$release_type" = "rc" ]; then
+                      # RC releases are marked as prerelease
+                      prerelease_flag="--prerelease"
+                      title="Release Candidate $version"
+                      tag="$version"
+                  else
+                      # Final releases are not marked as prerelease
+                      prerelease_flag=""
+                      title="Release $final_version"
+                      tag="$final_version"
+                  fi
+
+                  # Create draft release
+                  gh release create "$tag" \
+                      --title "$title" \
+                      --draft \
+                      $prerelease_flag \
+                      --target ${{ needs.version.outputs.version_bump_commit_sha }} \
+                      --notes "Release $version"
+
+                  echo "Created draft release for $tag"
