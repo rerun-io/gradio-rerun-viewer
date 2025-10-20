@@ -6,3 +6,10 @@ jobs:
         with:
             release-type: rc
         secrets: inherit
+
+defaults:
+    run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+
+# wants to push commits and create a PR
+permissions: write-all
