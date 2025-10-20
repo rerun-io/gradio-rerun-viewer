@@ -36,7 +36,8 @@ jobs:
               run: uv run gradio cc build
 
             - name: Upload gradio component artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: gradio-component
                   path: dist/gradio_rerun-{{ inputs.VERSION }}-py3-none-any.whl
+                  if-no-files-found: error
