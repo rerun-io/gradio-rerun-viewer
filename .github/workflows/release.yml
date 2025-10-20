@@ -85,3 +85,21 @@ jobs:
                   git commit -am "Bump versions to ${{ steps.versioning.outputs.current }}"
                   git push
                   echo "version_bump_commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+    python-checks:
+        name: Python Checks
+        needs: version
+        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+        uses: ./.github/workflows/reusable_checks_python.yml
+        with:
+            CONCURRENCY: pr-${{ github.event.pull_request.number }}
+        secrets: inherit
+
+    frontend-checks:
+        name: Frontend Checks
+        needs: version
+        if: github.event.pull_request.head.repo.owner.login == 'rerun-io'
+        uses: ./.github/workflows/reusable_checks_frontend.yml
+        with:
+            CONCURRENCY: pr-${{ github.event.pull_request.number }}
+        secrets: inherit
