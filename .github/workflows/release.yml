@@ -181,47 +181,47 @@ jobs:
 
         secrets: inherit
 
-    github-release:
-        name: Create GitHub Release
-        needs:
-            - version
-            - build-publish
-        runs-on: ubuntu-latest
-        # Only create GitHub releases for RC and final releases, not alpha
-        if: inputs.release-type == 'rc' || inputs.release-type == 'final'
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ needs.version.outputs.version_bump_commit_sha }}
+    # github-release:
+    #     name: Create GitHub Release
+    #     needs:
+    #         - version
+    #         - build-publish
+    #     runs-on: ubuntu-latest
+    #     # Only create GitHub releases for RC and final releases, not alpha
+    #     if: inputs.release-type == 'rc' || inputs.release-type == 'final'
+    #     steps:
+    #         - name: Checkout repository
+    #           uses: actions/checkout@v4
+    #           with:
+    #               ref: ${{ needs.version.outputs.version_bump_commit_sha }}
 
-            - name: Create GitHub Release
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  version="${{ needs.version.outputs.current }}"
-                  final_version="${{ needs.version.outputs.final }}"
-                  release_type="${{ inputs.release-type }}"
+    #         - name: Create GitHub Release
+    #           env:
+    #               GH_TOKEN: ${{ github.token }}
+    #           run: |
+    #               version="${{ needs.version.outputs.current }}"
+    #               final_version="${{ needs.version.outputs.final }}"
+    #               release_type="${{ inputs.release-type }}"
 
-                  # Determine release parameters
-                  if [ "$release_type" = "rc" ]; then
-                      # RC releases are marked as prerelease
-                      prerelease_flag="--prerelease"
-                      title="Release Candidate $version"
-                      tag="$version"
-                  else
-                      # Final releases are not marked as prerelease
-                      prerelease_flag=""
-                      title="Release $final_version"
-                      tag="$final_version"
-                  fi
+    #               # Determine release parameters
+    #               if [ "$release_type" = "rc" ]; then
+    #                   # RC releases are marked as prerelease
+    #                   prerelease_flag="--prerelease"
+    #                   title="Release Candidate $version"
+    #                   tag="$version"
+    #               else
+    #                   # Final releases are not marked as prerelease
+    #                   prerelease_flag=""
+    #                   title="Release $final_version"
+    #                   tag="$final_version"
+    #               fi
 
-                  # Create draft release
-                  gh release create "$tag" \
-                      --title "$title" \
-                      --draft \
-                      $prerelease_flag \
-                      --target ${{ needs.version.outputs.version_bump_commit_sha }} \
-                      --notes "Release $version"
+    #               # Create draft release
+    #               gh release create "$tag" \
+    #                   --title "$title" \
+    #                   --draft \
+    #                   $prerelease_flag \
+    #                   --target ${{ needs.version.outputs.version_bump_commit_sha }} \
+    #                   --notes "Release $version"
 
-                  echo "Created draft release for $tag"
+    #               echo "Created draft release for $tag"
