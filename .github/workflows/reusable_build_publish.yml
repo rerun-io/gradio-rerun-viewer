@@ -5,6 +5,9 @@ on:
             VERSION:
                 required: true
                 type: string
+            PEP440_VERSION:
+                required: true
+                type: string
             VERSION_BUMP_COMMIT_SHA:
                 required: true
                 type: string
@@ -39,5 +42,5 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: gradio-component
-                  path: dist/gradio_rerun-{{ inputs.VERSION }}-py3-none-any.whl
+                  path: dist/gradio_rerun-${{ inputs.PEP440_VERSION }}-py3-none-any.whl
                   if-no-files-found: error

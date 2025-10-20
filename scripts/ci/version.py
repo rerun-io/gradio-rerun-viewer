@@ -67,7 +67,7 @@ def validate_release_branch(branch_name):
     return True, version
 
 
-def cmd_get_version(_args):
+def cmd_get_version(_args):  # noqa: ARG001
     """Validate that the current branch follows the prepare-release-X.Y.Z pattern."""
     branch = get_current_branch()
     if not branch:
@@ -80,7 +80,12 @@ def cmd_get_version(_args):
         print("Expected pattern: prepare-release-X.Y.Z (e.g., prepare-release-1.2.3)", file=sys.stderr)
         sys.exit(1)
 
+    # Convert to PEP 440 format
+    # 0.x.y-alpha.N -> 0.x.yaN
+    pep440_version = version.replace("-alpha.", "a")
+
     print(f"Release version: {version}")
+    print(f"PEP 440 version: {pep440_version}")
 
 
 def update_pyproject_version(version: str, pyproject_path: Path = Path("pyproject.toml")):

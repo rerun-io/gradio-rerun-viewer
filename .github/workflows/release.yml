@@ -37,6 +37,7 @@ jobs:
         outputs:
             previous: ${{ steps.versioning.outputs.previous }}
             current: ${{ steps.versioning.outputs.current }}
+            pep440_version: ${{ steps.versioning.outputs.pep440_version }}
             final: ${{ steps.versioning.outputs.final }}
             py_wheel_version: ${{ steps.versioning.outputs.py_wheel_version }}
             version_bump_commit_sha: ${{ steps.commit.outputs.version_bump_commit_sha }}
@@ -59,7 +60,9 @@ jobs:
                   output=$(uv run python scripts/ci/version.py get-version)
                   echo "$output"
                   version=$(echo "$output" | grep "Release version:" | cut -d' ' -f3)
+                  pep440_version=$(echo "$output" | grep "PEP 440 version:" | cut -d' ' -f4)
                   echo "current=$version" >> $GITHUB_OUTPUT
+                  echo "pep440_version=$pep440_version" >> $GITHUB_OUTPUT
 
             - name: Update Rerun versions
               run: |
@@ -134,5 +137,6 @@ jobs:
         with:
             VERSION_BUMP_COMMIT_SHA: ${{ needs.version.outputs.version_bump_commit_sha }}
             VERSION: ${{ needs.version.outputs.current }}
+            PEP440_VERSION: ${{ needs.version.outputs.pep440_version }}
 
         secrets: inherit
