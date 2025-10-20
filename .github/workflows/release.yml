@@ -69,7 +69,7 @@ jobs:
                   uv run pnpm install @rerun-io/web-viewer@==${{ steps.versioning.outputs.current }}
                   popd
 
-                  uv add rerun-sdk@==${{ steps.versioning.outputs.current }} --upgrade
+                  uv add rerun-sdk==${{ steps.versioning.outputs.current }} --upgrade
 
                   echo "Rerun versions updated!"
 
