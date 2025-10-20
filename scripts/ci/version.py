@@ -82,7 +82,8 @@ def cmd_get_version(_args):  # noqa: ARG001
 
     # Convert to PEP 440 format
     # 0.x.y-alpha.N -> 0.x.yaN
-    pep440_version = version.replace("-alpha.", "a")
+    # 0.x.y-rc.N -> 0.x.yrcN
+    pep440_version = version.replace("-alpha.", "a").replace("-rc.", "rc")
 
     print(f"Release version: {version}")
     print(f"PEP 440 version: {pep440_version}")
@@ -134,10 +135,15 @@ def cmd_set_version(args):
     """Update the version in pyproject.toml and frontend/package.json."""
     version = args.version
 
-    update_pyproject_version(version)
+    # Convert to PEP 440 format for pyproject.toml
+    # 0.x.y-alpha.N -> 0.x.yaN
+    # 0.x.y-rc.N -> 0.x.yrcN
+    pep440_version = version.replace("-alpha.", "a").replace("-rc.", "rc")
+
+    update_pyproject_version(pep440_version)
     update_package_json_version(version)
 
-    print(f"Successfully updated version to {version} in both files")
+    print(f"Successfully updated pyproject.toml to {pep440_version} and package.json to {version}")
 
 
 if __name__ == "__main__":
