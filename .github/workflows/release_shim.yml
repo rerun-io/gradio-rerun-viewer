@@ -1,0 +1,8 @@
+name: Run release from branch
+on: push
+jobs:
+    run:
+        uses: ./.github/workflows/release.yml
+        with:
+            release-type: rc
+        secrets: inherit
