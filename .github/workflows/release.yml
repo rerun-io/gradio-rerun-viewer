@@ -32,13 +32,14 @@ permissions: write-all
 
 jobs:
     version:
-        name: "Versioning"
+        name: Versioning
         runs-on: ubuntu-latest
         outputs:
             previous: ${{ steps.versioning.outputs.previous }}
             current: ${{ steps.versioning.outputs.current }}
             final: ${{ steps.versioning.outputs.final }}
-            git_tag: ${{ steps.versioning.outputs.git_tag }}
+            py_wheel_version: ${{ steps.versioning.outputs.py_wheel_version }}
+            version_bump_commit_sha: ${{ steps.commit.outputs.version_bump_commit_sha }}
 
         steps:
             - name: Checkout repository
@@ -77,6 +78,7 @@ jobs:
                   uv run python scripts/ci/version.py set-version ${{ steps.versioning.outputs.current }}
 
             - name: Commit version changes
+              id: commit
               run: |
                   git config user.name "rerun-bot"
                   git config user.email "bot@rerun.io"
@@ -101,16 +103,6 @@ jobs:
             - name: Typecheck Python
               run: uv run mypy backend demo --exclude-gitignore
 
-    py-fmt:
-        name: Python Format
-        needs: version
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Python & uv
-              uses: ./.github/actions/setup-python-uv
-
             - name: Format Python
               run: uv run ruff format --check
 
@@ -128,16 +120,19 @@ jobs:
               working-directory: "./frontend"
               run: pnpm lint
 
-    frontend-fmt:
-        name: Frontend Format
-        needs: version
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Node.js & pnpm
-              uses: ./.github/actions/setup-nodejs-pnpm
-
             - name: Format frontend
               working-directory: "./frontend"
               run: pnpm format-check
+
+    build-publish:
+        name: Build & Publish
+        needs:
+            - version
+            - py-lints
+            - frontend-lints
+        uses: ./.github/workflows/reusable_build_publish.yml
+        with:
+            VERSION_BUMP_COMMIT_SHA: ${{ needs.version.outputs.version_bump_commit_sha }}
+            VERSION: ${{ needs.version.outputs.current }}
+
+        secrets: inherit

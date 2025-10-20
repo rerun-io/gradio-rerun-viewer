@@ -1,0 +1,42 @@
+name: Build & Publish
+on:
+    workflow_call:
+        inputs:
+            VERSION:
+                required: true
+                type: string
+            VERSION_BUMP_COMMIT_SHA:
+                required: true
+                type: string
+
+defaults:
+    run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+    contents: "read"
+    id-token: "write"
+
+jobs:
+    build-and-publish:
+        name: Build & Publish
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ inputs.VERSION_BUMP_COMMIT_SHA }}
+
+            - name: Setup Python & uv
+              uses: ./.github/actions/setup-python-uv
+
+            - name: Setup Node.js & pnpm
+              uses: ./.github/actions/setup-nodejs-pnpm
+
+            - name: Build gradio component
+              run: uv run gradio cc build
+
+            - name: Upload gradio component artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: gradio-component
+                  path: dist/gradio_rerun-{{ inputs.VERSION }}-py3-none-any.whl
