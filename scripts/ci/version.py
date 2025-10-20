@@ -78,7 +78,7 @@ def get_version_from_file(pyproject_path=Path("pyproject.toml")):
         print(f"ERROR: {pyproject_path} not found.", file=sys.stderr)
         sys.exit(1)
 
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
 
     for line in content.splitlines():
         if line.startswith("version = "):
@@ -183,7 +183,7 @@ def update_pyproject_version(version: str, pyproject_path: Path = Path("pyprojec
         print(f"ERROR: Could not find version field in {pyproject_path}.", file=sys.stderr)
         sys.exit(1)
 
-    pyproject_path.write_text("".join(lines))
+    pyproject_path.write_text("".join(lines), encoding="utf-8")
     print(f"  - Updated {pyproject_path} to version {version}")
 
 
@@ -193,12 +193,12 @@ def update_package_json_version(version: str, package_json_path: Path = Path("fr
         print(f"ERROR: {package_json_path} not found.", file=sys.stderr)
         sys.exit(1)
 
-    with package_json_path.open("r") as f:
+    with package_json_path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
     data["version"] = version
 
-    with package_json_path.open("w") as f:
+    with package_json_path.open("w", encoding="utf-8") as f:
         json.dump(data, f, indent="\t")
         f.write("\n")
 
