@@ -143,6 +143,7 @@ disable_error_code = "attr-defined"
 [dependency-groups]
 dev = [
   "build>=1.2.2.post1",
+  "gitpython>=3.1.45",
   "mypy>=1.18.2",
   "opencv-python>=4.10.0.84",
   "twine>=6.1.0",
