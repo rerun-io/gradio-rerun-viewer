@@ -28,31 +28,11 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
+      - name: Setup Python & uv
+        uses: ./.github/actions/setup-python-uv
 
-      - uses: astral-sh/setup-uv@v6
-
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: "./frontend/package.json"
-          run_install: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "./frontend/pnpm-lock.yaml"
-
-      - name: Install Python dependencies
-        run: uv sync --dev
-
-      - name: Install frontend dependencies
-        working-directory: "./frontend"
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js & pnpm
+        uses: ./.github/actions/setup-nodejs-pnpm
 
       - name: Build gradio component
         run: uv run gradio cc build

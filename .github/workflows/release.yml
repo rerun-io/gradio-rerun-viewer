@@ -47,15 +47,11 @@ jobs:
               with:
                   fetch-depth: 0
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version-file: ".python-version"
+            - name: Setup Python & uv
+              uses: ./.github/actions/setup-python-uv
 
-            - uses: astral-sh/setup-uv@v6
-
-            - name: Install dependencies
-              run: uv sync --dev
+            - name: Setup Node.js & pnpm
+              uses: ./.github/actions/setup-nodejs-pnpm
 
             - name: Get and validate version
               id: versioning
@@ -65,7 +61,19 @@ jobs:
                   version=$(echo "$output" | grep "Release version:" | cut -d' ' -f3)
                   echo "current=$version" >> $GITHUB_OUTPUT
 
-            - name: Update versions
+            - name: Update Rerun versions
+              run: |
+                  echo "Updating Rerun SDK and Web Viewer to version ${{ steps.versioning.outputs.current }}"
+
+                  pushd frontend
+                  uv run pnpm install @rerun-io/web-viewer@==${{ steps.versioning.outputs.current }}
+                  popd
+
+                  uv add rerun-sdk@==${{ steps.versioning.outputs.current }} --upgrade
+
+                  echo "Rerun versions updated!"
+
+            - name: Update package versions
               run: |
                   uv run python scripts/ci/version.py set-version ${{ steps.versioning.outputs.current }}
 

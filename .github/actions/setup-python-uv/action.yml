@@ -1,0 +1,17 @@
+name: "Setup Python & uv"
+description: "Sets up Python, uv, and installs Python dependencies"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install dependencies
+      shell: bash
+      run: uv sync --dev

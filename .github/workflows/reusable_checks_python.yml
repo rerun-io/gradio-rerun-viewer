@@ -27,14 +27,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
-      - uses: astral-sh/setup-uv@v6
 
-      - name: Install dependencies
-        run: uv sync --dev
+      - name: Setup Python & uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Lint Python
         run: uv run ruff check
@@ -50,15 +45,8 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
-
-      - uses: astral-sh/setup-uv@v6
-
-      - name: Install dependencies
-        run: uv sync --dev
+      - name: Setup Python & uv
+        uses: ./.github/actions/setup-python-uv
 
       - name: Format Python
         run: uv run ruff format --check

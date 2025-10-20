@@ -28,21 +28,8 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
 
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: "./frontend/package.json"
-          run_install: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "./frontend/pnpm-lock.yaml"
-
-      - name: Install frontend dependencies
-        working-directory: "./frontend"
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js & pnpm
+        uses: ./.github/actions/setup-nodejs-pnpm
 
       - name: Lint frontend
         working-directory: "./frontend"
@@ -56,21 +43,8 @@ jobs:
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '' }}
 
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: "./frontend/package.json"
-          run_install: false
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "./frontend/pnpm-lock.yaml"
-
-      - name: Install frontend dependencies
-        working-directory: "./frontend"
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js & pnpm
+        uses: ./.github/actions/setup-nodejs-pnpm
 
       - name: Format frontend
         working-directory: "./frontend"
