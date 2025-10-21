@@ -243,11 +243,11 @@ def cmd_version(args):
 
         if pre_id == args.pre_id:
             # Same pre-id, just increment the number
-            new_pre_num = (pre_num if pre_num is not None else -1) + 1
+            new_pre_num = (pre_num if pre_num is not None else 0) + 1
             new_version = format_version(major, minor, patch, args.pre_id, new_pre_num)
         else:
-            # Different pre-id, reset to 0 (or 1 depending on preference)
-            new_version = format_version(major, minor, patch, args.pre_id, 0)
+            # Different pre-id, start at 1
+            new_version = format_version(major, minor, patch, args.pre_id, 1)
     else:
         print(f"ERROR: Unknown bump type: {args.bump}", file=sys.stderr)
         sys.exit(1)
