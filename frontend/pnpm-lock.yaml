@@ -30,8 +30,8 @@ importers:
         specifier: 0.18.1
         version: 0.18.1(bufferutil@4.0.9)(svelte@4.2.20)
       '@rerun-io/web-viewer':
-        specifier: 0.26.1
-        version: 0.26.1
+        specifier: 0.27.0-alpha.1
+        version: 0.27.0-alpha.1
       cropperjs:
         specifier: ^2.0.1
         version: 2.0.1
@@ -786,8 +786,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@rerun-io/web-viewer@0.26.1':
-    resolution: {integrity: sha512-nPTe2wjnVI9Wrzm1EYuTidABeJpYtbsIlJfE1HL2lIvrmO4KKRAF4Bp82nL4XOj6pDf8I4P8e/BW8nnXDA6g5g==}
+  '@rerun-io/web-viewer@0.27.0-alpha.1':
+    resolution: {integrity: sha512-sBjTZRFBTvEbqh/Sa4tfe82WtevxBS4pZ34pXbVT/+/uhheZwXDxeNxB3GiaMTGHWELEYk+hV8jKP0YemjvQDw==}
 
   '@rollup/plugin-sucrase@5.0.2':
     resolution: {integrity: sha512-4MhIVH9Dy2Hwose1/x5QMs0XF7yn9jDd/yozHqzdIrMWIolgFpGnrnVhQkqTaK1RALY/fpyrEKmwH/04vr1THA==}
@@ -3856,7 +3856,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@rerun-io/web-viewer@0.26.1': {}
+  '@rerun-io/web-viewer@0.27.0-alpha.1': {}
 
   '@rollup/plugin-sucrase@5.0.2(rollup@4.52.3)':
     dependencies:
