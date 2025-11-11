@@ -30,7 +30,7 @@ importers:
         specifier: 0.18.1
         version: 0.18.1(bufferutil@4.0.9)(svelte@4.2.20)
       '@rerun-io/web-viewer':
-        specifier: 0.27.0
+        specifier: '==0.27.0'
         version: 0.27.0
       cropperjs:
         specifier: ^2.0.1
