@@ -309,6 +309,7 @@ jobs:
               uses: ./.github/actions/setup-nodejs-pnpm
 
             - name: Bump to next alpha version
+              id: bump-version
               run: |
                   # Get latest changes
                   git pull
@@ -327,14 +328,14 @@ jobs:
                   new_version=$(echo "$new_version_output" | grep "Release version:" | cut -d' ' -f3)
 
                   echo "Bumped from $current_version to $new_version"
-                  echo "NEW_VERSION=$new_version" >> $GITHUB_ENV
+                  echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
             - name: Update package versions
               uses: ./.github/actions/update-package-versions
               with:
-                  version: ${{ env.NEW_VERSION }}
+                  version: ${{ steps.bump-version.outputs.new_version }}
 
-            - name: Commit and push
+            - name: Bump version commit
               uses: ./.github/actions/commit-and-push
               with:
-                  commit_message: "Bump versions to ${{ env.NEW_VERSION }}"
+                  commit_message: "Bump versions to ${{ steps.bump-version.outputs.new_version }}"
