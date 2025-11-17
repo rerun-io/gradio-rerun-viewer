@@ -1,0 +1,15 @@
+name: "Update Package Versions"
+description: "Updates package versions in package.json, pyproject.toml, etc."
+
+inputs:
+  version:
+    description: "Version to set in package files"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update package versions
+      shell: bash
+      run: |
+        uv run python scripts/ci/version.py set-version ${{ inputs.version }}

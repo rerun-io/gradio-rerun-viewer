@@ -1,0 +1,26 @@
+name: "Update Rerun Versions"
+description: "Updates Rerun SDK and Web Viewer dependencies"
+
+inputs:
+  version:
+    description: "Release version for npm packages"
+    required: true
+  pep440_version:
+    description: "PEP 440 version for Python packages"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Rerun versions
+      shell: bash
+      run: |
+        echo "Updating Rerun SDK and Web Viewer to version ${{ inputs.version }}"
+
+        pushd frontend
+        uv run pnpm install @rerun-io/web-viewer@==${{ inputs.version }}
+        popd
+
+        uv add rerun-sdk==${{ inputs.pep440_version }} --upgrade
+
+        echo "Rerun versions updated!"

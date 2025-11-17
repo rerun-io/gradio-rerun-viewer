@@ -1,0 +1,34 @@
+name: "Commit and Push"
+description: "Commits and pushes changes with a specified commit message"
+
+inputs:
+  commit_message:
+    description: "Commit message to use"
+    required: true
+
+outputs:
+  commit_sha:
+    description: "SHA of the commit (current HEAD if no changes)"
+    value: ${{ steps.commit.outputs.commit_sha }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Commit and push
+      id: commit
+      shell: bash
+      run: |
+        git config user.name "rerun-bot"
+        git config user.email "bot@rerun.io"
+
+        # Check if there are any changes to commit
+        git add -A
+        if git diff --cached --quiet; then
+            echo "No version changes to commit"
+            echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        else
+            echo "Committing version changes"
+            git commit -m "${{ inputs.commit_message }}"
+            git push
+            echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        fi
