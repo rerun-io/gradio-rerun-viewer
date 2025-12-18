@@ -1,6 +1,6 @@
 {
 	"name": "gradio_rerun",
-	"version": "0.28.0-alpha.4",
+	"version": "0.28.0-alpha.3",
 	"description": "Gradio UI packages",
 	"type": "module",
 	"author": "",
