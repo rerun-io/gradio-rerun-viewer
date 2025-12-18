@@ -1,6 +1,4 @@
-<svelte:options accessors={true} />
-
-<script context="module" lang="ts">
+<script module lang="ts">
 	export { default as BaseExample } from './Example.svelte';
 </script>
 
@@ -43,7 +41,7 @@
 
 	let rr: WebViewer;
 	let channel: LogChannel;
-	let ref: HTMLDivElement;
+	let ref = $state<HTMLDivElement>();
 	let dragging = $state(false);
 
 	/**
