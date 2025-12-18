@@ -6,13 +6,12 @@
 
 <script lang="ts">
 	import './app.css';
-	import type { Gradio } from '@gradio/utils';
+	import { Gradio } from '@gradio/utils';
 	import { LogChannel, WebViewer, type Panel, type PanelState } from '@rerun-io/web-viewer';
 	import { onMount } from 'svelte';
 	import { Block } from '@gradio/atoms';
 	import { StatusTracker } from '@gradio/statustracker';
 	import type { FileData } from '@gradio/client';
-	import type { LoadingStatus } from '@gradio/statustracker';
 
 	import type { SelectionChangeItem } from '@rerun-io/web-viewer';
 
@@ -21,42 +20,42 @@
 		is_stream: boolean;
 	}
 
-	export let elem_id = '';
-	export let elem_classes: string[] = [];
-	export let visible = true;
-	export let height: number | string = 640;
-	export let value: null | BinaryStream | (FileData | string)[] = null;
-	export let container = true;
-	export let scale: number | null = null;
-	export let min_width: number | undefined = undefined;
-	export let loading_status: LoadingStatus;
-	export let interactive: boolean;
-	export let streaming: boolean;
-	export let panel_states: { [K in Panel]: PanelState } | null = null;
-
-	export let gradio: Gradio<{
+	interface RerunEvents {
 		change: never;
 		upload: never;
 		clear: never;
-		clear_status: LoadingStatus;
 		selection_change: SelectionChangeItem[];
 		time_update: number;
 		timeline_change: { timeline: string; time: number };
-	}>;
+	}
 
-	$: height = typeof height === 'number' ? `${height}px` : height;
+	interface RerunProps {
+		value: null | BinaryStream | (FileData | string)[];
+		height: number | string;
+		streaming: boolean;
+		panel_states: { [K in Panel]: PanelState } | null;
+	}
 
-	let dragging: boolean;
+	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
+
+	const props = $props();
+	const gradio = new RerunGradio(props);
+
 	let rr: WebViewer;
 	let channel: LogChannel;
 	let ref: HTMLDivElement;
-	let patched_loading_status: LoadingStatus;
+	let dragging = $state(false);
 
 	/**
 	 * Used to keep track of the playlist currently being fetched
 	 * in case we're streaming data.
 	 */
 	let current_playlist: { url: string; content: string } | null = null;
+
+	$effect(() => {
+		const h = gradio.props.height;
+		gradio.props.height = typeof h === 'number' ? `${h}px` : h;
+	});
 
 	/** Fetch a list of segment URLs */
 	async function fetch_playlist(value: BinaryStream) {
@@ -97,6 +96,7 @@
 	}
 
 	async function try_load_value() {
+		const value = gradio.props.value;
 		if (value == null) {
 			return;
 		}
@@ -145,6 +145,7 @@
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
 	function setup_panels() {
+		const panel_states = gradio.props.panel_states;
 		if (rr?.ready && panel_states) {
 			for (const panel in panel_states) {
 				if (!is_panel(panel)) continue;
@@ -154,11 +155,15 @@
 	}
 
 	onMount(() => {
+		console.log('Rerun component mounted, gradio:', gradio);
 		rr = new WebViewer();
 		rr.on('ready', () => {
+			console.log('Rerun viewer ready');
 			channel = rr.open_channel('gradio');
 			try_load_value();
 			setup_panels();
+			// Clear loading status when viewer is ready
+			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
 
@@ -179,42 +184,42 @@
 		};
 	});
 
-	$: {
-		patched_loading_status = loading_status;
-		if (streaming && patched_loading_status?.status === 'generating') {
-			patched_loading_status.status = 'complete';
-		}
-	}
+	// Watch for value changes
+	$effect(() => {
+		gradio.props.value;
+		try_load_value();
+	});
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	$: (value, try_load_value());
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	$: (panel_states, setup_panels());
+	// Watch for panel_states changes
+	$effect(() => {
+		gradio.props.panel_states;
+		setup_panels();
+	});
 </script>
 
-{#if !interactive}
+{#if !gradio.shared.interactive}
 	<Block
-		{visible}
+		visible={gradio.shared.visible}
 		variant="solid"
 		border_mode={dragging ? 'focus' : 'base'}
 		padding={false}
-		{elem_id}
-		{elem_classes}
+		elem_id={gradio.shared.elem_id}
+		elem_classes={gradio.shared.elem_classes}
 		allow_overflow={false}
-		{container}
-		{scale}
-		{min_width}
+		container={gradio.shared.container}
+		scale={gradio.shared.scale}
+		min_width={gradio.shared.min_width}
 	>
-		{#if !streaming}
+		{#if !gradio.props.streaming}
 			<StatusTracker
-				autoscroll={gradio.autoscroll}
+				autoscroll={gradio.shared.autoscroll}
 				i18n={gradio.i18n}
-				{...patched_loading_status}
-				on:clear_status={() => gradio.dispatch('clear_status', loading_status)}
+				{...gradio.shared.loading_status}
+				on_clear_status={() => gradio.dispatch('clear_status', gradio.shared.loading_status)}
 			/>
 		{/if}
 
-		<div class="viewer" bind:this={ref} style:height></div>
+		<div class="viewer" bind:this={ref} style:height={gradio.props.height}></div>
 	</Block>
 {/if}
 
