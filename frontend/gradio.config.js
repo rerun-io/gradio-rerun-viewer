@@ -36,6 +36,6 @@ export default {
 		preprocess: []
 	},
 	build: {
-		target: 'esnext'
+		target: 'modules'
 	}
 };

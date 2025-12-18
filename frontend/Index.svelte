@@ -214,7 +214,7 @@
 			/>
 		{/if}
 
-		<div class="viewer" bind:this={ref} style:height />
+		<div class="viewer" bind:this={ref} style:height></div>
 	</Block>
 {/if}
 
