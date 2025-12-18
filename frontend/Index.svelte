@@ -93,8 +93,7 @@
 		}
 	}
 
-	async function try_load_value() {
-		const value = gradio.props.value;
+	async function try_load_value(value: RerunProps['value'] = gradio.props.value) {
 		if (value == null) {
 			return;
 		}
@@ -142,8 +141,7 @@
 
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
-	function setup_panels() {
-		const panel_states = gradio.props.panel_states;
+	function setup_panels(panel_states: RerunProps['panel_states'] = gradio.props.panel_states) {
 		if (rr?.ready && panel_states) {
 			for (const panel in panel_states) {
 				if (!is_panel(panel)) continue;
@@ -184,14 +182,14 @@
 
 	// Watch for value changes
 	$effect(() => {
-		gradio.props.value;
-		try_load_value();
+		const value = gradio.props.value;
+		try_load_value(value);
 	});
 
 	// Watch for panel_states changes
 	$effect(() => {
-		gradio.props.panel_states;
-		setup_panels();
+		const panel_states = gradio.props.panel_states;
+		setup_panels(panel_states);
 	});
 </script>
 
