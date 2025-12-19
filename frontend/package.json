@@ -1,6 +1,6 @@
 {
 	"name": "gradio_rerun",
-	"version": "0.28.0-alpha.4",
+	"version": "0.28.0",
 	"description": "Gradio UI packages",
 	"type": "module",
 	"author": "",
@@ -14,7 +14,7 @@
 		"@gradio/upload": "0.17.2",
 		"@gradio/utils": "0.10.4",
 		"@gradio/wasm": "0.18.1",
-		"@rerun-io/web-viewer": "0.28.0-alpha.4",
+		"@rerun-io/web-viewer": "0.28.0",
 		"cropperjs": "^2.1.0",
 		"lazy-brush": "^2.0.2",
 		"resize-observer-polyfill": "^1.5.1",
