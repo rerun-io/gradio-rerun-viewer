@@ -153,6 +153,8 @@ jobs:
     py-lints:
         name: Python Lints (ruff, mypy, …)
         needs: version
+        permissions:
+            contents: read
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -172,6 +174,8 @@ jobs:
     frontend-lints:
         name: Frontend Lints (eslint, prettier, …)
         needs: version
+        permissions:
+            contents: read
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -193,6 +197,9 @@ jobs:
             - version
             - py-lints
             - frontend-lints
+        permissions:
+            id-token: write
+            contents: read
         uses: ./.github/workflows/reusable_build_publish.yml
         with:
             VERSION_BUMP_COMMIT_SHA: ${{ needs.version.outputs.version_bump_commit_sha }}
