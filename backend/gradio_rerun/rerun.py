@@ -178,7 +178,7 @@ class Rerun(Component, StreamingOutput):
         def is_url(url_like: Path | str) -> bool:
             if isinstance(url_like, Path):
                 return False
-            return url_like.startswith(("http://", "https://"))
+            return url_like.startswith(("http://", "https://", "rerun+http://", "rerun+https://", "rerun://"))
 
         return RerunData(
             root=[
