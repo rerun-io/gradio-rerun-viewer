@@ -132,7 +132,7 @@ jobs:
             - name: Create Pull Request
               id: create-pr
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
               run: |
                   version="${{ needs.version.outputs.current }}"
 
@@ -230,7 +230,7 @@ jobs:
             - name: Create GitHub Release
               id: create-release
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
               run: |
                   version="${{ needs.version.outputs.current }}"
                   final_version="${{ needs.version.outputs.final }}"
@@ -278,7 +278,7 @@ jobs:
 
             - name: Post comment to PR
               env:
-                  GH_TOKEN: ${{ github.token }}
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
               run: |
                   pr_number="${{ needs.create-pr.outputs.pr_number }}"
                   version="${{ needs.version.outputs.current }}"
