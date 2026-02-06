@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from gradio import EventData
-from rerun.event import (
+from rerun._event import (
     PauseEvent,
     PlayEvent,
     SelectionChangeEvent,
