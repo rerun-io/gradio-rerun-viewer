@@ -235,6 +235,9 @@ def cmd_version(args):
     if args.exact:
         # Set exact version
         new_version = args.exact
+    elif args.bump == "minor":
+        # Bump minor version, reset patch and prerelease (e.g., 0.27.0 -> 0.28.0)
+        new_version = format_version(major, minor + 1, 0)
     elif args.bump == "prerelease":
         # Bump prerelease version
         if not args.pre_id:
@@ -292,7 +295,7 @@ if __name__ == "__main__":
     version_parser = subparsers.add_parser("version", help="Bump version in files")
     version_group = version_parser.add_mutually_exclusive_group(required=True)
     version_group.add_argument("--exact", help="Set exact version (e.g., 0.1.0)")
-    version_group.add_argument("--bump", choices=["prerelease"], help="Bump type")
+    version_group.add_argument("--bump", choices=["minor", "prerelease"], help="Bump type")
     version_parser.add_argument(
         "--pre-id", choices=["alpha", "rc"], help="Prerelease identifier (required with --bump prerelease)"
     )
