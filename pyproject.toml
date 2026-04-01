@@ -1,6 +1,6 @@
 [project]
 name = "gradio_rerun"
-version = "0.30.2"
+version = "0.31.1"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
@@ -34,7 +34,7 @@ classifiers = [
 
 dependencies = [
   "gradio>=6.0.0",
-  "rerun-sdk==0.30.2",
+  "rerun-sdk==0.31.1",
   "opencv-python",
   "twine>=6.1.0",
 ]
