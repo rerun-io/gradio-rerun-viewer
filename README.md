@@ -312,6 +312,7 @@ with gr.Blocks() as demo:
 
 if __name__ == "__main__":
     demo.launch(ssr_mode=False)
+
 ```
 
 ## `Rerun`
@@ -542,7 +543,9 @@ The code snippet below is accurate in cases where the component is used as both 
 - **As input:** Should return, the value to send over to the Rerun viewer on the front-end.
 
  ```python
- def predict(value: RerunData | None) -> list[pathlib.Path | str] | pathlib.Path | str | bytes:
+ def predict(
+     value: RerunData | None
+ ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes:
      return value
  ```
  
