@@ -1,6 +1,6 @@
 [project]
 name = "gradio_rerun"
-version = "0.31.4"
+version = "0.32.0a1"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
