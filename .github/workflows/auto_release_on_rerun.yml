@@ -1,0 +1,73 @@
+name: Auto Release (triggered by rerun)
+
+on:
+    repository_dispatch:
+        types: [rerun-released]
+
+defaults:
+    run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+
+permissions:
+    contents: write
+    actions: write
+
+jobs:
+    trigger-release:
+        name: Prepare branch and trigger Release workflow
+        runs-on: ubuntu-latest
+        steps:
+            - name: Validate payload
+              id: validate
+              run: |
+                  version="${{ github.event.client_payload.version }}"
+                  if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                      echo "::error::Invalid version: '$version' (expected X.Y.Z)"
+                      exit 1
+                  fi
+                  echo "version=$version" >> "$GITHUB_OUTPUT"
+                  echo "branch=prepare-release-$version" >> "$GITHUB_OUTPUT"
+
+            - name: Checkout main
+              uses: actions/checkout@v4
+              with:
+                  ref: main
+                  token: ${{ secrets.RERUN_BOT_TOKEN }}
+                  fetch-depth: 0
+
+            - name: Skip if branch or tag already exists
+              id: precheck
+              env:
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
+              run: |
+                  branch="${{ steps.validate.outputs.branch }}"
+                  version="${{ steps.validate.outputs.version }}"
+
+                  if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+                      echo "Branch $branch already exists — assuming release in progress; skipping."
+                      echo "skip=true" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+                  if gh release view "$version" >/dev/null 2>&1; then
+                      echo "Release tag $version already exists — skipping."
+                      echo "skip=true" >> "$GITHUB_OUTPUT"
+                      exit 0
+                  fi
+                  echo "skip=false" >> "$GITHUB_OUTPUT"
+
+            - name: Create release branch
+              if: steps.precheck.outputs.skip != 'true'
+              run: |
+                  branch="${{ steps.validate.outputs.branch }}"
+                  git checkout -b "$branch"
+                  git push origin "$branch"
+
+            - name: Trigger Release workflow
+              if: steps.precheck.outputs.skip != 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
+              run: |
+                  branch="${{ steps.validate.outputs.branch }}"
+                  gh workflow run release.yml \
+                      --ref "$branch" \
+                      -f release-type=final
