@@ -4,15 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from gradio import processing_utils
 from gradio.components.base import Component, StreamingOutput
 from gradio.data_classes import FileData, GradioRootModel, MediaStreamChunk
 from gradio.events import EventListener
-
-if TYPE_CHECKING:
-    from gradio.components.base import Component
 
 
 class RerunData(GradioRootModel):
