@@ -70,4 +70,5 @@ jobs:
                   branch="${{ steps.validate.outputs.branch }}"
                   gh workflow run release.yml \
                       --ref "$branch" \
-                      -f release-type=final
+                      -f release-type=final \
+                      -f auto-merge=true
