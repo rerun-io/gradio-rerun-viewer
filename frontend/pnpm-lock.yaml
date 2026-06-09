@@ -30,8 +30,8 @@ importers:
         specifier: 0.18.1
         version: 0.18.1(bufferutil@4.0.9)(svelte@5.46.0)
       '@rerun-io/web-viewer':
-        specifier: 0.32.2
-        version: 0.32.2
+        specifier: 0.33.0
+        version: 0.33.0
       cropperjs:
         specifier: ^2.1.0
         version: 2.1.0
@@ -686,8 +686,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@rerun-io/web-viewer@0.32.2':
-    resolution: {integrity: sha512-avvGObQXib8U+rKpPUUxyiUfP9gbLzW0SNpFoGTaHRW1VNRD8JFlZnuquCtzvKLkihaCUrPUS6jd8dtPl5pexQ==}
+  '@rerun-io/web-viewer@0.33.0':
+    resolution: {integrity: sha512-q5im69yyOOFnJcyhI7ycjYYXngSHqBH3jOCj9XE8DpbKHwMfF5vcAuE97sx1ntnCvv+THybWijP3DAZ4JLHnQA==}
 
   '@rollup/rollup-android-arm-eabi@4.53.5':
     resolution: {integrity: sha512-iDGS/h7D8t7tvZ1t6+WPK04KD0MwzLZrG0se1hzBjSi5fyxlsiggoJHwh18PCFNn7tG43OWb6pdZ6Y+rMlmyNQ==}
@@ -2832,7 +2832,7 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@rerun-io/web-viewer@0.32.2': {}
+  '@rerun-io/web-viewer@0.33.0': {}
 
   '@rollup/rollup-android-arm-eabi@4.53.5':
     optional: true
