@@ -11,6 +11,11 @@ on:
                     - rc
                     - final
                 required: true
+            auto-merge:
+                description: "Automatically publish the GitHub release and merge the release PR once all jobs succeed (final releases only)."
+                type: boolean
+                default: false
+                required: false
 
 concurrency:
     group: ${{ github.ref_name }}
@@ -361,3 +366,34 @@ jobs:
               uses: ./.github/actions/commit-and-push
               with:
                   commit_message: "Bump versions to ${{ steps.bump-version.outputs.new_version }}"
+
+    finalize:
+        name: Publish Release and Merge PR
+        needs:
+            - version
+            - create-pr
+            - github-release
+            - bump-next-version
+        permissions:
+            contents: write
+            pull-requests: write
+        runs-on: ubuntu-latest
+        # Only auto-finalize for final releases when explicitly requested (e.g. by the auto-release workflow).
+        # Depends on bump-next-version so the merged PR also carries the next alpha bump.
+        if: inputs.auto-merge && inputs.release-type == 'final'
+        steps:
+            - name: Publish GitHub release
+              env:
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
+              run: |
+                  tag="${{ needs.github-release.outputs.release_tag }}"
+                  gh release edit "$tag" --repo "${{ github.repository }}" --draft=false
+                  echo "Published release $tag"
+
+            - name: Merge release PR
+              env:
+                  GH_TOKEN: ${{ secrets.RERUN_BOT_TOKEN }}
+              run: |
+                  pr_number="${{ needs.create-pr.outputs.pr_number }}"
+                  gh pr merge "$pr_number" --repo "${{ github.repository }}" --squash
+                  echo "Merged PR #$pr_number"
