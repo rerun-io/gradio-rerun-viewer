@@ -34,7 +34,7 @@ classifiers = [
 
 dependencies = [
   "gradio>=6.0.0",
-  "rerun-sdk==0.36.1",
+  "rerun-sdk==0.36.2",
   "opencv-python",
   "twine>=6.1.0",
 ]
