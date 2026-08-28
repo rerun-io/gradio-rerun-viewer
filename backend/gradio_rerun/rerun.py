@@ -19,7 +19,7 @@ class RerunData(GradioRootModel):
     `FileData` is used for data served from Gradio, while `str` is used for URLs Rerun will open from a remote server.
     """
 
-    root: Sequence[FileData | Path | str] | None
+    root: Sequence[FileData | Path | str] | dict[str, str | int | bool | None] | None
 
 
 class Rerun(Component, StreamingOutput):
@@ -149,7 +149,10 @@ class Rerun(Component, StreamingOutput):
             return None
         return payload
 
-    def postprocess(self, value: list[Path | str] | Path | str | bytes) -> RerunData | bytes:
+    def postprocess(
+        self,
+        value: list[Path | str] | Path | str | bytes | dict[str, str | int | bool | None] | None,
+    ) -> RerunData | bytes:
         """
         Post process the value.
 
@@ -162,6 +165,11 @@ class Rerun(Component, StreamingOutput):
         """
         if value is None:
             return RerunData(root=None)
+
+        if isinstance(value, dict):
+            if value.get("command") == "set_time":
+                return RerunData(root=value)
+            raise ValueError(f"Unknown Rerun viewer command: {value.get('command')!r}")
 
         if isinstance(value, bytes):
             if self.streaming:

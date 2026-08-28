@@ -18,6 +18,13 @@
 		is_stream: boolean;
 	}
 
+	interface SetTimeCommand {
+		command: 'set_time';
+		timeline: string | null;
+		time: number;
+		play: boolean;
+	}
+
 	interface RerunEvents {
 		change: never;
 		upload: never;
@@ -28,7 +35,7 @@
 	}
 
 	interface RerunProps {
-		value: null | BinaryStream | (FileData | string)[];
+		value: null | BinaryStream | SetTimeCommand | (FileData | string)[];
 		height: number | string;
 		streaming: boolean;
 		panel_states: { [K in Panel]: PanelState } | null;
@@ -99,6 +106,29 @@
 		}
 
 		if (rr == undefined || !rr.ready) {
+			return;
+		}
+
+		if (!Array.isArray(value) && 'command' in value && value.command === 'set_time') {
+			const recording_id = rr.get_active_recording_id();
+			if (recording_id === null) {
+				console.warn('Cannot set Rerun time cursor: no recording is active');
+				return;
+			}
+
+			const active_timeline = rr.get_active_timeline(recording_id);
+			const timeline = value.timeline ?? active_timeline;
+			if (timeline === null) {
+				console.warn('Cannot set Rerun time cursor: no timeline is active');
+				return;
+			}
+
+			if (timeline !== active_timeline) {
+				rr.set_active_timeline(recording_id, timeline);
+			}
+
+			rr.set_playing(recording_id, value.play);
+			rr.set_current_time(recording_id, timeline, value.time);
 			return;
 		}
 

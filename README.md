@@ -545,7 +545,12 @@ The code snippet below is accurate in cases where the component is used as both 
  ```python
  def predict(
      value: RerunData | None
- ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes:
+ ) -> list[pathlib.Path | str]
+    | pathlib.Path
+    | str
+    | bytes
+    | dict[str, str | int | bool | None]
+    | None:
      return value
  ```
  
@@ -553,5 +558,9 @@ The code snippet below is accurate in cases where the component is used as both 
 ## `RerunData`
 ```python
 class RerunData(GradioRootModel):
-    root: Sequence[FileData | Path | str] | None
+    root: (
+        Sequence[FileData | Path | str]
+        | dict[str, str | int | bool | None]
+        | None
+    )
 ```
