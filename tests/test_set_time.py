@@ -3,18 +3,21 @@
 from __future__ import annotations
 
 import unittest
+from collections.abc import Mapping
 from datetime import datetime, timezone
+from inspect import signature
 
 from gradio_rerun import Rerun
-from gradio_rerun.commands import SetTimeUpdate, TimeControlCommand, set_time
+from gradio_rerun.commands import set_time
 
 
 class SetTimeTest(unittest.TestCase):
     """Test command construction and time conversion."""
 
-    def command(self, update: SetTimeUpdate) -> TimeControlCommand:
-        command = update["command"]
-        self.assertEqual(update, {"command": command, "__type__": "update"})
+    def command(self, update: Mapping[str, object]) -> Mapping[str, object]:
+        command = update["_command"]
+        self.assertIsInstance(command, Mapping)
+        self.assertEqual(update, {"_command": command, "__type__": "update"})
         return command
 
     def test_sequence_uses_active_timeline_by_default(self) -> None:
@@ -58,6 +61,16 @@ class SetTimeTest(unittest.TestCase):
             value.model_dump(),  # type: ignore[union-attr]
             ["https://example.com/recording.rrd"],
         )
+
+    def test_command_transport_uses_private_parameter(self) -> None:
+        self.assertNotIn("command", signature(Rerun.__init__).parameters)
+        self.assertIn("_command", signature(Rerun.__init__).parameters)
+
+    def test_component_accepts_gradio_command_update(self) -> None:
+        update = set_time(sequence=1)
+        component = Rerun(render=False, _command=update["_command"])
+
+        self.assertEqual(component._command, update["_command"])
 
 
 if __name__ == "__main__":

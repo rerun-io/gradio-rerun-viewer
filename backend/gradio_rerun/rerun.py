@@ -11,7 +11,7 @@ from gradio.components.base import Component, StreamingOutput
 from gradio.data_classes import FileData, GradioRootModel, MediaStreamChunk
 from gradio.events import EventListener
 
-from gradio_rerun.commands import TimeControlCommand
+from gradio_rerun.commands import _TimeControlCommand
 
 
 class RerunData(GradioRootModel):
@@ -73,7 +73,7 @@ class Rerun(Component, StreamingOutput):
         elem_classes: list[str] | str | None = None,
         render: bool = True,
         panel_states: dict[str, Any] | None = None,
-        command: TimeControlCommand | None = None,
+        _command=None,
     ):
         """
         Initialize a Rerun Viewer block.
@@ -112,14 +112,12 @@ class Rerun(Component, StreamingOutput):
                 Any panels set cannot be toggled by the user in the viewer.
                 Panel names are "top", "blueprint", "selection", and "time".
                 States are "hidden", "collapsed", and "expanded".
-            command: A viewer command sent by a component property update.
-                Use [`set_time`][gradio_rerun.commands.set_time] instead of setting this directly.
 
         """
         self.height = height
         self.streaming = streaming
         self.panel_states = panel_states
-        self.command = command
+        self._command: _TimeControlCommand | None = _command
         super().__init__(
             label=label,
             every=every,
@@ -138,7 +136,7 @@ class Rerun(Component, StreamingOutput):
     def get_config(self):
         config = super().get_config()
         config["panel_states"] = self.panel_states
-        config["command"] = self.command
+        config["_command"] = self._command
         return config
 
     def preprocess(self, payload: RerunData | None) -> RerunData | None:

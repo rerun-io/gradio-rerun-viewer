@@ -40,7 +40,7 @@
 		height: number | string;
 		streaming: boolean;
 		panel_states: { [K in Panel]: PanelState } | null;
-		command: TimeControlCommand | null | undefined;
+		_command: TimeControlCommand | null | undefined;
 	}
 
 	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
@@ -52,7 +52,6 @@
 	let channel: LogChannel;
 	let ref = $state<HTMLDivElement>();
 	let dragging = $state(false);
-	let pending_command: TimeControlCommand | null = null;
 	let last_command_id: string | null = null;
 
 	/**
@@ -150,14 +149,12 @@
 		rr.open(value.url);
 	}
 
-	function try_apply_command(
-		command: TimeControlCommand | null | undefined = pending_command ?? gradio.props.command
-	) {
+	function try_apply_command() {
+		const command = gradio.props._command;
 		if (command == null || command.type !== 'time_ctrl' || command.id === last_command_id) {
 			return;
 		}
 
-		pending_command = command;
 		if (rr === undefined || !rr.ready) {
 			return;
 		}
@@ -173,18 +170,11 @@
 		}
 
 		const timeline = rr.get_active_timeline(recording_id);
-		if (timeline === null) {
-			return;
-		}
-		if (command.timeline !== null && timeline !== command.timeline) {
-			return;
-		}
-		if (command.id === last_command_id) {
+		if (timeline === null || (command.timeline !== null && timeline !== command.timeline)) {
 			return;
 		}
 
 		last_command_id = command.id;
-		pending_command = null;
 
 		rr.set_playing(recording_id, command.play);
 		rr.set_current_time(recording_id, timeline, command.time);
@@ -214,12 +204,11 @@
 			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
+		rr.on('recording_open', () => try_apply_command());
+		rr.on('timeline_change', () => try_apply_command());
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
-			if (type === 'recording_open' || type === 'timeline_change') {
-				try_apply_command();
-			}
 			gradio.dispatch(type, event);
 		});
 
@@ -242,10 +231,9 @@
 	});
 
 	$effect(() => {
-		const command = gradio.props.command;
+		const command = gradio.props._command;
 		if (command != null && command.id !== last_command_id) {
-			pending_command = command;
-			try_apply_command(command);
+			try_apply_command();
 		}
 	});
 

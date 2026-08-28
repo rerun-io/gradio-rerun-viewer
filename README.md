@@ -515,19 +515,6 @@ dict[str, typing.Any] | None
 <td align="left"><code>None</code></td>
 <td align="left">Force viewer panels to a specific state.</td>
 </tr>
-
-<tr>
-<td align="left"><code>command</code></td>
-<td align="left" style="width: 25%;">
-
-```python
-TimeControlCommand | None
-```
-
-</td>
-<td align="left"><code>None</code></td>
-<td align="left">A viewer command sent by a component property update.</td>
-</tr>
 </tbody></table>
 
 
@@ -562,16 +549,6 @@ The code snippet below is accurate in cases where the component is used as both 
      return value
  ```
  
-
-## `TimeControlCommand`
-```python
-class TimeControlCommand(TypedDict):
-    id: str
-    type: Literal["time_ctrl"]
-    timeline: str | None
-    time: int
-    play: bool
-```
 
 ## `RerunData`
 ```python

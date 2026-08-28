@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     import numpy as np
 
 
-class TimeControlCommand(TypedDict):
+class _TimeControlCommand(TypedDict):
     """Serializable command consumed by the embedded viewer."""
 
     id: str
@@ -24,18 +24,18 @@ class TimeControlCommand(TypedDict):
     play: bool
 
 
-class SetTimeUpdate(TypedDict):
+class _SetTimeUpdate(TypedDict):
     """Gradio property update containing a time-control command."""
 
-    command: TimeControlCommand
+    _command: _TimeControlCommand
     __type__: Literal["update"]
 
 
-__all__ = ["SetTimeUpdate", "TimeControlCommand", "set_time"]
+__all__ = ["set_time"]
 
 
 @overload
-def set_time(timeline: str | None = None, *, sequence: int, play: bool = False) -> SetTimeUpdate: ...
+def set_time(timeline: str | None = None, *, sequence: int, play: bool = False) -> _SetTimeUpdate: ...
 
 
 @overload
@@ -44,7 +44,7 @@ def set_time(
     *,
     duration: int | float | timedelta | np.timedelta64,
     play: bool = False,
-) -> SetTimeUpdate: ...
+) -> _SetTimeUpdate: ...
 
 
 @overload
@@ -53,7 +53,7 @@ def set_time(
     *,
     timestamp: int | float | datetime | np.datetime64,
     play: bool = False,
-) -> SetTimeUpdate: ...
+) -> _SetTimeUpdate: ...
 
 
 def set_time(
@@ -63,7 +63,7 @@ def set_time(
     duration: int | float | timedelta | np.timedelta64 | None = None,
     timestamp: int | float | datetime | np.datetime64 | None = None,
     play: bool = False,
-) -> SetTimeUpdate:
+) -> _SetTimeUpdate:
     """
     Create a Gradio update that sets the embedded viewer's time cursor.
 
@@ -92,11 +92,11 @@ def set_time(
         assert timestamp is not None
         time = to_nanos_since_epoch(timestamp)
 
-    command: TimeControlCommand = TimeControlCommand(
+    command: _TimeControlCommand = _TimeControlCommand(
         id=uuid4().hex,
         type="time_ctrl",
         timeline=timeline,
         time=time,
         play=play,
     )
-    return cast("SetTimeUpdate", gradio_update(command=command))
+    return cast("_SetTimeUpdate", gradio_update(_command=command))
