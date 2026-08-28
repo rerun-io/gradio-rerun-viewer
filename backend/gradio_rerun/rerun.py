@@ -11,6 +11,8 @@ from gradio.components.base import Component, StreamingOutput
 from gradio.data_classes import FileData, GradioRootModel, MediaStreamChunk
 from gradio.events import EventListener
 
+from gradio_rerun.commands import TimeControlCommand
+
 
 class RerunData(GradioRootModel):
     """
@@ -19,7 +21,7 @@ class RerunData(GradioRootModel):
     `FileData` is used for data served from Gradio, while `str` is used for URLs Rerun will open from a remote server.
     """
 
-    root: Sequence[FileData | Path | str] | dict[str, str | int | bool | None] | None
+    root: Sequence[FileData | Path | str] | None
 
 
 class Rerun(Component, StreamingOutput):
@@ -71,6 +73,7 @@ class Rerun(Component, StreamingOutput):
         elem_classes: list[str] | str | None = None,
         render: bool = True,
         panel_states: dict[str, Any] | None = None,
+        command: TimeControlCommand | None = None,
     ):
         """
         Initialize a Rerun Viewer block.
@@ -109,11 +112,14 @@ class Rerun(Component, StreamingOutput):
                 Any panels set cannot be toggled by the user in the viewer.
                 Panel names are "top", "blueprint", "selection", and "time".
                 States are "hidden", "collapsed", and "expanded".
+            command: A viewer command sent by a component property update.
+                Use [`set_time`][gradio_rerun.commands.set_time] instead of setting this directly.
 
         """
         self.height = height
         self.streaming = streaming
         self.panel_states = panel_states
+        self.command = command
         super().__init__(
             label=label,
             every=every,
@@ -132,6 +138,7 @@ class Rerun(Component, StreamingOutput):
     def get_config(self):
         config = super().get_config()
         config["panel_states"] = self.panel_states
+        config["command"] = self.command
         return config
 
     def preprocess(self, payload: RerunData | None) -> RerunData | None:
@@ -149,10 +156,7 @@ class Rerun(Component, StreamingOutput):
             return None
         return payload
 
-    def postprocess(
-        self,
-        value: list[Path | str] | Path | str | bytes | dict[str, str | int | bool | None] | None,
-    ) -> RerunData | bytes:
+    def postprocess(self, value: list[Path | str] | Path | str | bytes | None) -> RerunData | bytes:
         """
         Post process the value.
 
@@ -165,11 +169,6 @@ class Rerun(Component, StreamingOutput):
         """
         if value is None:
             return RerunData(root=None)
-
-        if isinstance(value, dict):
-            if value.get("command") == "set_time":
-                return RerunData(root=value)
-            raise ValueError(f"Unknown Rerun viewer command: {value.get('command')!r}")
 
         if isinstance(value, bytes):
             if self.streaming:

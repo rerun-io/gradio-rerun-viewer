@@ -6,28 +6,31 @@ import unittest
 from datetime import datetime, timezone
 
 from gradio_rerun import Rerun
-from gradio_rerun.commands import set_time
+from gradio_rerun.commands import SetTimeUpdate, TimeControlCommand, set_time
 
 
 class SetTimeTest(unittest.TestCase):
     """Test command construction and time conversion."""
 
-    def test_sequence_uses_active_timeline_by_default(self) -> None:
-        command = set_time(sequence=42)
+    def command(self, update: SetTimeUpdate) -> TimeControlCommand:
+        command = update["command"]
+        self.assertEqual(update, {"command": command, "__type__": "update"})
+        return command
 
-        self.assertEqual(
-            command,
-            {
-                "command": "set_time",
-                "timeline": None,
-                "time": 42,
-                "play": False,
-            },
-        )
+    def test_sequence_uses_active_timeline_by_default(self) -> None:
+        command = self.command(set_time(sequence=42))
+
+        self.assertEqual(command["type"], "time_ctrl")
+        self.assertEqual(command["timeline"], None)
+        self.assertEqual(command["time"], 42)
+        self.assertEqual(command["play"], False)
+        self.assertIsInstance(command["id"], str)
 
     def test_temporal_values_are_converted_to_nanoseconds(self) -> None:
-        duration = set_time("elapsed", duration=1.5, play=True)
-        timestamp = set_time("capture_time", timestamp=datetime(1970, 1, 1, tzinfo=timezone.utc))
+        duration = self.command(set_time("elapsed", duration=1.5, play=True))
+        timestamp = self.command(
+            set_time("capture_time", timestamp=datetime(1970, 1, 1, tzinfo=timezone.utc)),
+        )
 
         self.assertEqual(duration["time"], 1_500_000_000)
         self.assertTrue(duration["play"])
@@ -35,31 +38,26 @@ class SetTimeTest(unittest.TestCase):
 
     def test_exactly_one_time_value_is_required(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly one"):
-            set_time()
+            set_time()  # type: ignore[call-overload]
 
         with self.assertRaisesRegex(ValueError, "exactly one"):
             set_time(sequence=1, duration=1.0)  # type: ignore[call-overload]
 
-    def test_component_serializes_command_as_its_value(self) -> None:
+    def test_repeated_commands_have_distinct_ids(self) -> None:
+        first = self.command(set_time(sequence=7))
+        second = self.command(set_time(sequence=7))
+
+        self.assertNotEqual(first["id"], second["id"])
+
+    def test_component_value_remains_recording_data(self) -> None:
         component = Rerun(render=False)
 
-        value = component.postprocess(set_time("frame", sequence=7))
+        value = component.postprocess("https://example.com/recording.rrd")
 
         self.assertEqual(
             value.model_dump(),  # type: ignore[union-attr]
-            {
-                "command": "set_time",
-                "timeline": "frame",
-                "time": 7,
-                "play": False,
-            },
+            ["https://example.com/recording.rrd"],
         )
-
-    def test_component_rejects_unknown_commands(self) -> None:
-        component = Rerun(render=False)
-
-        with self.assertRaisesRegex(ValueError, "Unknown Rerun viewer command"):
-            component.postprocess({"command": "unknown"})
 
 
 if __name__ == "__main__":

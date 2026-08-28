@@ -515,6 +515,19 @@ dict[str, typing.Any] | None
 <td align="left"><code>None</code></td>
 <td align="left">Force viewer panels to a specific state.</td>
 </tr>
+
+<tr>
+<td align="left"><code>command</code></td>
+<td align="left" style="width: 25%;">
+
+```python
+TimeControlCommand | None
+```
+
+</td>
+<td align="left"><code>None</code></td>
+<td align="left">A viewer command sent by a component property update.</td>
+</tr>
 </tbody></table>
 
 
@@ -545,22 +558,23 @@ The code snippet below is accurate in cases where the component is used as both 
  ```python
  def predict(
      value: RerunData | None
- ) -> list[pathlib.Path | str]
-    | pathlib.Path
-    | str
-    | bytes
-    | dict[str, str | int | bool | None]
-    | None:
+ ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes | None:
      return value
  ```
  
 
+## `TimeControlCommand`
+```python
+class TimeControlCommand(TypedDict):
+    id: str
+    type: Literal["time_ctrl"]
+    timeline: str | None
+    time: int
+    play: bool
+```
+
 ## `RerunData`
 ```python
 class RerunData(GradioRootModel):
-    root: (
-        Sequence[FileData | Path | str]
-        | dict[str, str | int | bool | None]
-        | None
-    )
+    root: Sequence[FileData | Path | str] | None
 ```

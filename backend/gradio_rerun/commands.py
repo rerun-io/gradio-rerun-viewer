@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeAlias, overload
+from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
+from uuid import uuid4
 
+from gradio import update as gradio_update
 from rerun.time import to_nanos, to_nanos_since_epoch
 
 if TYPE_CHECKING:
@@ -12,13 +14,28 @@ if TYPE_CHECKING:
     import numpy as np
 
 
-SetTimeCommand: TypeAlias = dict[str, str | int | bool | None]
+class TimeControlCommand(TypedDict):
+    """Serializable command consumed by the embedded viewer."""
 
-__all__ = ["SetTimeCommand", "set_time"]
+    id: str
+    type: Literal["time_ctrl"]
+    timeline: str | None
+    time: int
+    play: bool
+
+
+class SetTimeUpdate(TypedDict):
+    """Gradio property update containing a time-control command."""
+
+    command: TimeControlCommand
+    __type__: Literal["update"]
+
+
+__all__ = ["SetTimeUpdate", "TimeControlCommand", "set_time"]
 
 
 @overload
-def set_time(timeline: str | None = None, *, sequence: int, play: bool = False) -> SetTimeCommand: ...
+def set_time(timeline: str | None = None, *, sequence: int, play: bool = False) -> SetTimeUpdate: ...
 
 
 @overload
@@ -27,7 +44,7 @@ def set_time(
     *,
     duration: int | float | timedelta | np.timedelta64,
     play: bool = False,
-) -> SetTimeCommand: ...
+) -> SetTimeUpdate: ...
 
 
 @overload
@@ -36,7 +53,7 @@ def set_time(
     *,
     timestamp: int | float | datetime | np.datetime64,
     play: bool = False,
-) -> SetTimeCommand: ...
+) -> SetTimeUpdate: ...
 
 
 def set_time(
@@ -46,11 +63,12 @@ def set_time(
     duration: int | float | timedelta | np.timedelta64 | None = None,
     timestamp: int | float | datetime | np.datetime64 | None = None,
     play: bool = False,
-) -> SetTimeCommand:
+) -> SetTimeUpdate:
     """
-    Create a command that sets the embedded viewer's time cursor.
+    Create a Gradio update that sets the embedded viewer's time cursor.
 
-    Return this command from a Gradio callback whose output is a [`Rerun`][gradio_rerun.Rerun] component.
+    Return this update from a Gradio callback whose output is a [`Rerun`][gradio_rerun.Rerun] component.
+    The recording remains the component's value; the cursor update travels through a separate command property.
     If `timeline` is omitted, the viewer uses its active timeline.
     Exactly one of `sequence`, `duration`, or `timestamp` must be set.
 
@@ -67,16 +85,18 @@ def set_time(
         raise ValueError("set_time expects exactly one of sequence, duration, or timestamp")
 
     if sequence is not None:
-        time = sequence
+        time: int = sequence
     elif duration is not None:
         time = to_nanos(duration)
     else:
         assert timestamp is not None
         time = to_nanos_since_epoch(timestamp)
 
-    return {
-        "command": "set_time",
-        "timeline": timeline,
-        "time": time,
-        "play": play,
-    }
+    command: TimeControlCommand = TimeControlCommand(
+        id=uuid4().hex,
+        type="time_ctrl",
+        timeline=timeline,
+        time=time,
+        play=play,
+    )
+    return cast("SetTimeUpdate", gradio_update(command=command))

@@ -18,8 +18,9 @@
 		is_stream: boolean;
 	}
 
-	interface SetTimeCommand {
-		command: 'set_time';
+	interface TimeControlCommand {
+		id: string;
+		type: 'time_ctrl';
 		timeline: string | null;
 		time: number;
 		play: boolean;
@@ -35,10 +36,11 @@
 	}
 
 	interface RerunProps {
-		value: null | BinaryStream | SetTimeCommand | (FileData | string)[];
+		value: null | BinaryStream | (FileData | string)[];
 		height: number | string;
 		streaming: boolean;
 		panel_states: { [K in Panel]: PanelState } | null;
+		command: TimeControlCommand | null | undefined;
 	}
 
 	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
@@ -50,6 +52,8 @@
 	let channel: LogChannel;
 	let ref = $state<HTMLDivElement>();
 	let dragging = $state(false);
+	let pending_command: TimeControlCommand | null = null;
+	let last_command_id: string | null = null;
 
 	/**
 	 * Used to keep track of the playlist currently being fetched
@@ -109,29 +113,6 @@
 			return;
 		}
 
-		if (!Array.isArray(value) && 'command' in value && value.command === 'set_time') {
-			const recording_id = rr.get_active_recording_id();
-			if (recording_id === null) {
-				console.warn('Cannot set Rerun time cursor: no recording is active');
-				return;
-			}
-
-			const active_timeline = rr.get_active_timeline(recording_id);
-			const timeline = value.timeline ?? active_timeline;
-			if (timeline === null) {
-				console.warn('Cannot set Rerun time cursor: no timeline is active');
-				return;
-			}
-
-			if (timeline !== active_timeline) {
-				rr.set_active_timeline(recording_id, timeline);
-			}
-
-			rr.set_playing(recording_id, value.play);
-			rr.set_current_time(recording_id, timeline, value.time);
-			return;
-		}
-
 		// List of static or dynamic rrd URLs.
 		// We just let the Viewer handle the streaming.
 		if (Array.isArray(value)) {
@@ -169,6 +150,46 @@
 		rr.open(value.url);
 	}
 
+	function try_apply_command(
+		command: TimeControlCommand | null | undefined = pending_command ?? gradio.props.command
+	) {
+		if (command == null || command.type !== 'time_ctrl' || command.id === last_command_id) {
+			return;
+		}
+
+		pending_command = command;
+		if (rr === undefined || !rr.ready) {
+			return;
+		}
+
+		const recording_id = rr.get_active_recording_id();
+		if (recording_id === null) {
+			return;
+		}
+
+		const active_timeline = rr.get_active_timeline(recording_id);
+		if (command.timeline !== null && command.timeline !== active_timeline) {
+			rr.set_active_timeline(recording_id, command.timeline);
+		}
+
+		const timeline = rr.get_active_timeline(recording_id);
+		if (timeline === null) {
+			return;
+		}
+		if (command.timeline !== null && timeline !== command.timeline) {
+			return;
+		}
+		if (command.id === last_command_id) {
+			return;
+		}
+
+		last_command_id = command.id;
+		pending_command = null;
+
+		rr.set_playing(recording_id, command.play);
+		rr.set_current_time(recording_id, timeline, command.time);
+	}
+
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
 	function setup_panels(panel_states: RerunProps['panel_states'] = gradio.props.panel_states) {
@@ -187,6 +208,7 @@
 			console.log('Rerun viewer ready');
 			channel = rr.open_channel('gradio');
 			try_load_value();
+			try_apply_command();
 			setup_panels();
 			// Clear loading status when viewer is ready
 			gradio.dispatch('clear_status', gradio.shared.loading_status);
@@ -195,6 +217,9 @@
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
+			if (type === 'recording_open' || type === 'timeline_change') {
+				try_apply_command();
+			}
 			gradio.dispatch(type, event);
 		});
 
@@ -214,6 +239,14 @@
 	$effect(() => {
 		const value = gradio.props.value;
 		try_load_value(value);
+	});
+
+	$effect(() => {
+		const command = gradio.props.command;
+		if (command != null && command.id !== last_command_id) {
+			pending_command = command;
+			try_apply_command(command);
+		}
 	});
 
 	// Watch for panel_states changes
