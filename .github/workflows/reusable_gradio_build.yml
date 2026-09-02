@@ -37,6 +37,9 @@ jobs:
       - name: Build gradio component
         run: uv run gradio cc build
 
+      - name: Test generated component assets
+        run: uv run python -m unittest discover -s tests
+
       - name: Fail if generated files changed
         run: |
           # Show what changed (if anything) for easier debugging

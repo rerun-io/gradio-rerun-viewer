@@ -24,7 +24,7 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.1",
 		"@eslint/js": "^9.39.2",
-		"@gradio/preview": "0.16.2",
+		"@gradio/preview": "0.17.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"@tailwindcss/vite": "^4.1.18",
 		"@types/node": "^22.19.3",

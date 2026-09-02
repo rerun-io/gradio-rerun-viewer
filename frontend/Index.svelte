@@ -158,8 +158,6 @@
 			channel = rr.open_channel('gradio');
 			try_load_value();
 			setup_panels();
-			// Clear loading status when viewer is ready
-			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
 
