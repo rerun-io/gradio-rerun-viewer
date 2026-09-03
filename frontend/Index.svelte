@@ -38,11 +38,12 @@
 
 	const props = $props();
 
+	// TODO(pablo): remove once Gradio ships the upstream fix (untrack around the mount call).
 	// Workaround for a Gradio bug (6.9+): MountCustomComponent mounts this component inside a
 	// tracked core $effect, so prop reads made synchronously during init (the Gradio helper
 	// constructor) become dependencies of that effect and every prop update remounts the whole
 	// component. Constructing the helper inside our own $effect moves those reads out of Gradio's
-	// tracking scope. Remove once Gradio ships the fix (untrack around the mount call).
+	// tracking scope.
 	let gradio = $state<RerunGradio>();
 	$effect(() => {
 		untrack(() => {
