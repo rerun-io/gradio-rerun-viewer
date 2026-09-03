@@ -720,7 +720,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "build", marker = "extra == 'dev'" },
-    { name = "gradio", specifier = ">=6.0.0" },
+    { name = "gradio", specifier = ">=6.10.0" },
     { name = "opencv-python" },
     { name = "opencv-python", marker = "extra == 'dev'", specifier = ">=4.10.0" },
     { name = "rerun-sdk", specifier = "==0.37.0" },

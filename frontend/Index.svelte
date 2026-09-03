@@ -6,7 +6,7 @@
 	import './app.css';
 	import { Gradio } from '@gradio/utils';
 	import { LogChannel, WebViewer, type Panel, type PanelState } from '@rerun-io/web-viewer';
-	import { onMount } from 'svelte';
+	import { untrack } from 'svelte';
 	import { Block } from '@gradio/atoms';
 	import { StatusTracker } from '@gradio/statustracker';
 	import type { FileData } from '@gradio/client';
@@ -37,7 +37,19 @@
 	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
 
 	const props = $props();
-	const gradio = new RerunGradio(props);
+
+	// TODO(pablo): remove once Gradio ships the upstream fix (untrack around the mount call).
+	// Workaround for a Gradio bug (6.9+): MountCustomComponent mounts this component inside a
+	// tracked core $effect, so prop reads made synchronously during init (the Gradio helper
+	// constructor) become dependencies of that effect and every prop update remounts the whole
+	// component. Constructing the helper inside our own $effect moves those reads out of Gradio's
+	// tracking scope.
+	let gradio = $state<RerunGradio>();
+	$effect(() => {
+		untrack(() => {
+			gradio = new RerunGradio(props);
+		});
+	});
 
 	let rr: WebViewer;
 	let channel: LogChannel;
@@ -51,6 +63,7 @@
 	let current_playlist: { url: string; content: string } | null = null;
 
 	$effect(() => {
+		if (!gradio) return;
 		const h = gradio.props.height;
 		gradio.props.height = typeof h === 'number' ? `${h}px` : h;
 	});
@@ -93,7 +106,7 @@
 		}
 	}
 
-	async function try_load_value(value: RerunProps['value'] = gradio.props.value) {
+	async function try_load_value(value: RerunProps['value'] = gradio?.props.value) {
 		if (value == null) {
 			return;
 		}
@@ -141,7 +154,7 @@
 
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
-	function setup_panels(panel_states: RerunProps['panel_states'] = gradio.props.panel_states) {
+	function setup_panels(panel_states: RerunProps['panel_states'] = gradio?.props.panel_states) {
 		if (rr?.ready && panel_states) {
 			for (const panel in panel_states) {
 				if (!is_panel(panel)) continue;
@@ -150,7 +163,12 @@
 		}
 	}
 
-	onMount(() => {
+	// Starts once `gradio` exists and the viewer container has been bound, which now happens a tick
+	// after mount because the markup is gated on the lazily constructed helper.
+	$effect(() => {
+		if (!gradio || !ref) return;
+		const target = ref;
+
 		console.log('Rerun component mounted, gradio:', gradio);
 		rr = new WebViewer();
 		rr.on('ready', () => {
@@ -158,17 +176,15 @@
 			channel = rr.open_channel('gradio');
 			try_load_value();
 			setup_panels();
-			// Clear loading status when viewer is ready
-			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
-			gradio.dispatch(type, event);
+			gradio?.dispatch(type, event);
 		});
 
-		rr.start(undefined, ref, {
+		rr.start(undefined, target, {
 			hide_welcome_screen: true,
 			allow_fullscreen: true,
 			width: '',
@@ -182,18 +198,20 @@
 
 	// Watch for value changes
 	$effect(() => {
+		if (!gradio) return;
 		const value = gradio.props.value;
 		try_load_value(value);
 	});
 
 	// Watch for panel_states changes
 	$effect(() => {
+		if (!gradio) return;
 		const panel_states = gradio.props.panel_states;
 		setup_panels(panel_states);
 	});
 </script>
 
-{#if !gradio.shared.interactive}
+{#if gradio && !gradio.shared.interactive}
 	<Block
 		visible={gradio.shared.visible}
 		variant="solid"
