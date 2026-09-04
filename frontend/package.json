@@ -14,7 +14,7 @@
 		"@gradio/upload": "0.17.8",
 		"@gradio/utils": "0.12.2",
 		"@gradio/wasm": "0.18.1",
-		"@rerun-io/web-viewer": "0.37.0",
+		"@rerun-io/web-viewer": "0.37.1",
 		"cropperjs": "^2.1.0",
 		"lazy-brush": "^2.0.2",
 		"resize-observer-polyfill": "^1.5.1",
