@@ -11,6 +11,8 @@ from gradio.components.base import Component, StreamingOutput
 from gradio.data_classes import FileData, GradioRootModel, MediaStreamChunk
 from gradio.events import EventListener
 
+from gradio_rerun.commands import _TimeControlCommand
+
 
 class RerunData(GradioRootModel):
     """
@@ -71,6 +73,7 @@ class Rerun(Component, StreamingOutput):
         elem_classes: list[str] | str | None = None,
         render: bool = True,
         panel_states: dict[str, Any] | None = None,
+        _command=None,
     ):
         """
         Initialize a Rerun Viewer block.
@@ -114,6 +117,7 @@ class Rerun(Component, StreamingOutput):
         self.height = height
         self.streaming = streaming
         self.panel_states = panel_states
+        self._command: _TimeControlCommand | None = _command
         super().__init__(
             label=label,
             every=every,
@@ -132,6 +136,7 @@ class Rerun(Component, StreamingOutput):
     def get_config(self):
         config = super().get_config()
         config["panel_states"] = self.panel_states
+        config["_command"] = self._command
         return config
 
     def preprocess(self, payload: RerunData | None) -> RerunData | None:
@@ -149,7 +154,7 @@ class Rerun(Component, StreamingOutput):
             return None
         return payload
 
-    def postprocess(self, value: list[Path | str] | Path | str | bytes) -> RerunData | bytes:
+    def postprocess(self, value: list[Path | str] | Path | str | bytes | None) -> RerunData | bytes:
         """
         Post process the value.
 

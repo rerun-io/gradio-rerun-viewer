@@ -18,6 +18,14 @@
 		is_stream: boolean;
 	}
 
+	interface TimeControlCommand {
+		id: string;
+		type: 'time_ctrl';
+		timeline: string | null;
+		time: number;
+		play: boolean;
+	}
+
 	interface RerunEvents {
 		change: never;
 		upload: never;
@@ -32,6 +40,7 @@
 		height: number | string;
 		streaming: boolean;
 		panel_states: { [K in Panel]: PanelState } | null;
+		_command: TimeControlCommand | null | undefined;
 	}
 
 	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
@@ -43,6 +52,7 @@
 	let channel: LogChannel;
 	let ref = $state<HTMLDivElement>();
 	let dragging = $state(false);
+	let last_command_id: string | null = null;
 
 	/**
 	 * Used to keep track of the playlist currently being fetched
@@ -139,6 +149,37 @@
 		rr.open(value.url);
 	}
 
+	function try_apply_command() {
+		const command = gradio.props._command;
+		if (command == null || command.type !== 'time_ctrl' || command.id === last_command_id) {
+			return;
+		}
+
+		if (rr === undefined || !rr.ready) {
+			return;
+		}
+
+		const recording_id = rr.get_active_recording_id();
+		if (recording_id === null) {
+			return;
+		}
+
+		const active_timeline = rr.get_active_timeline(recording_id);
+		if (command.timeline !== null && command.timeline !== active_timeline) {
+			rr.set_active_timeline(recording_id, command.timeline);
+		}
+
+		const timeline = rr.get_active_timeline(recording_id);
+		if (timeline === null || (command.timeline !== null && timeline !== command.timeline)) {
+			return;
+		}
+
+		last_command_id = command.id;
+
+		rr.set_playing(recording_id, command.play);
+		rr.set_current_time(recording_id, timeline, command.time);
+	}
+
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
 	function setup_panels(panel_states: RerunProps['panel_states'] = gradio.props.panel_states) {
@@ -157,11 +198,14 @@
 			console.log('Rerun viewer ready');
 			channel = rr.open_channel('gradio');
 			try_load_value();
+			try_apply_command();
 			setup_panels();
 			// Clear loading status when viewer is ready
 			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
+		rr.on('recording_open', () => try_apply_command());
+		rr.on('timeline_change', () => try_apply_command());
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
@@ -184,6 +228,13 @@
 	$effect(() => {
 		const value = gradio.props.value;
 		try_load_value(value);
+	});
+
+	$effect(() => {
+		const command = gradio.props._command;
+		if (command != null && command.id !== last_command_id) {
+			try_apply_command();
+		}
 	});
 
 	// Watch for panel_states changes
