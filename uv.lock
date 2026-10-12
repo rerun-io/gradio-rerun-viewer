@@ -730,7 +730,7 @@ wheels = [
 
 [[package]]
 name = "gradio-rerun"
-version = "0.39.0"
+version = "0.40.0a1"
 source = { editable = "." }
 dependencies = [
     { name = "gradio" },
