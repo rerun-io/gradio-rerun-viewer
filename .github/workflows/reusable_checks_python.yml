@@ -34,6 +34,9 @@ jobs:
       - name: Lint Python
         run: uv run ruff check
 
+      - name: Test Python
+        run: uv run python -m unittest discover -s tests
+
       - name: Typecheck Python
         run: uv run mypy backend demo --exclude-gitignore
 
