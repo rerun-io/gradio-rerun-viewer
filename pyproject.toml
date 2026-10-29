@@ -4,7 +4,7 @@ version = "0.40.0a1"
 description = "Rerun viewer with Gradio"
 readme = "README.md"
 license = { text = "MIT OR Apache-2.0" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [
   { name = "Radamés Ajna", email = "radamajna@gmail.com" },
   { name = "rerun.io", email = "opensource@rerun.io" },
@@ -23,9 +23,6 @@ classifiers = [
   'Operating System :: OS Independent',
   'Programming Language :: Python :: 3',
   'Programming Language :: Python :: 3 :: Only',
-  'Programming Language :: Python :: 3.8',
-  'Programming Language :: Python :: 3.9',
-  'Programming Language :: Python :: 3.10',
   'Programming Language :: Python :: 3.11',
   'Topic :: Scientific/Engineering',
   'Topic :: Scientific/Engineering :: Artificial Intelligence',
