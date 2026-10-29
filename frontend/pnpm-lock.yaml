@@ -30,8 +30,8 @@ importers:
         specifier: 0.18.1
         version: 0.18.1(bufferutil@4.0.9)(svelte@5.46.0)
       '@rerun-io/web-viewer':
-        specifier: 0.39.0
-        version: 0.39.0
+        specifier: 0.41.0
+        version: 0.41.0
       cropperjs:
         specifier: ^2.1.0
         version: 2.1.0
@@ -124,6 +124,9 @@ packages:
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
+
+  '@bufbuild/protobuf@2.16.0':
+    resolution: {integrity: sha512-FWa0sPlqYGJgpTs6OxBRcL/AW4JT0OIO+W1ajerluoTVh8CV0B7XM1qsNCRgnkSCkRCgOICKHRQlY17jrsm0+Q==}
 
   '@cropper/element-canvas@2.1.0':
     resolution: {integrity: sha512-el+rfJpZxsD2q5XxDBA4fRczcrOqB65Lb7roqXOq8LKufwf4bPWA9C6DjNJJahh/TP94dsLIEy3tSkgRMDv3Aw==}
@@ -686,8 +689,8 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@rerun-io/web-viewer@0.39.0':
-    resolution: {integrity: sha512-W4olhwbUfUrKI8ZS2KbdpG6S9Mn5qh50qD9/RaFSEI0uNQRb2S1q/MwoNeJblQyJGoq68mZDpt8KYEAHMDut1g==}
+  '@rerun-io/web-viewer@0.41.0':
+    resolution: {integrity: sha512-QNNLSf5DoJPYJCWP/RbdECJRWNK0FP4Y/+NwIa1Cev6qzmPIMW2b+Zgna4gY8lGqzXAOPWC3OnhUSaJi7k/sIg==}
 
   '@rollup/rollup-android-arm-eabi@4.53.5':
     resolution: {integrity: sha512-iDGS/h7D8t7tvZ1t6+WPK04KD0MwzLZrG0se1hzBjSi5fyxlsiggoJHwh18PCFNn7tG43OWb6pdZ6Y+rMlmyNQ==}
@@ -2345,6 +2348,8 @@ snapshots:
       '@babel/helper-validator-identifier': 7.28.5
     optional: true
 
+  '@bufbuild/protobuf@2.16.0': {}
+
   '@cropper/element-canvas@2.1.0':
     dependencies:
       '@cropper/element': 2.1.0
@@ -2832,7 +2837,9 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
-  '@rerun-io/web-viewer@0.39.0': {}
+  '@rerun-io/web-viewer@0.41.0':
+    dependencies:
+      '@bufbuild/protobuf': 2.16.0
 
   '@rollup/rollup-android-arm-eabi@4.53.5':
     optional: true
