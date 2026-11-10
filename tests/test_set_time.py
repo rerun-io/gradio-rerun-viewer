@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime
 from inspect import signature
 
+import numpy as np
 from gradio_rerun import Rerun
 from gradio_rerun.commands import set_time
 
@@ -38,6 +39,18 @@ class SetTimeTest(unittest.TestCase):
         self.assertEqual(duration["time"], "1500000000")
         self.assertTrue(duration["play"])
         self.assertEqual(timestamp["time"], "0")
+
+    def test_times_keep_nanosecond_precision(self) -> None:
+        timestamp = self.command(set_time(timestamp=np.datetime64("2026-11-09T12:00:00.123456789", "ns")))
+        sequence = self.command(set_time(sequence=np.int64(2**60)))
+
+        self.assertEqual(timestamp["kind"], "timestamp")
+        self.assertEqual(timestamp["time"], "1794225600123456789")
+        self.assertEqual(sequence["time"], str(2**60))
+
+    def test_sequence_must_be_an_integer(self) -> None:
+        with self.assertRaises(TypeError):
+            set_time(sequence=1.5)  # type: ignore[call-overload]
 
     def test_exactly_one_time_value_is_required(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly one"):

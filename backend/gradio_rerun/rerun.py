@@ -73,7 +73,7 @@ class Rerun(Component, StreamingOutput):
         elem_classes: list[str] | str | None = None,
         render: bool = True,
         panel_states: dict[str, Any] | None = None,
-        _command=None,
+        _command=None,  # Unannotated, so the private transport stays out of the generated docs.
     ):
         """
         Initialize a Rerun Viewer block.

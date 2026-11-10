@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from operator import index
 from typing import TYPE_CHECKING, Literal, TypedDict, cast, overload
 from uuid import uuid4
 
@@ -87,7 +88,7 @@ def set_time(
 
     kind: Literal["sequence", "duration", "timestamp"]
     if sequence is not None:
-        kind, time = "sequence", sequence
+        kind, time = "sequence", index(sequence)
     elif duration is not None:
         kind, time = "duration", to_nanos(duration)
     else:
