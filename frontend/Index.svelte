@@ -53,7 +53,6 @@
 	let channel: LogChannel;
 	let ref = $state<HTMLDivElement>();
 	let dragging = $state(false);
-	let last_command_id: string | null = null;
 
 	/**
 	 * Used to keep track of the playlist currently being fetched
@@ -150,41 +149,42 @@
 		rr.open(value.url);
 	}
 
-	let pending_command_id: string | null = null;
+	/** The command that is applied or in flight; a newer command replaces it. */
+	let sent_command_id: string | null = null;
+	let warned_command_id: string | null = null;
 
 	/**
-	 * Apply the latest time-control command once the viewer has a recording.
+	 * Apply the latest time-control command through `WebViewer.set_time`, which sets
+	 * the timeline, play state, and cursor in one operation.
 	 *
-	 * `WebViewer.set_time` sets the timeline, play state, and cursor in one operation.
-	 * It rejects while the requested timeline does not exist yet; the next
-	 * `recording_open`, `timeline_change`, or `time_update` event retries.
+	 * It rejects while no recording is open or the timeline does not exist yet;
+	 * the next viewer event (`recording_open`, `timeline_change`, `time_update`) retries.
 	 */
 	async function try_apply_command() {
 		const command = gradio.props._command;
-		if (command == null || command.type !== 'time_ctrl') return;
-		if (command.id === last_command_id || command.id === pending_command_id) return;
-		if (rr === undefined || !rr.ready || rr.get_active_recording_id() === null) return;
+		if (command?.type !== 'time_ctrl' || command.id === sent_command_id || !rr?.ready) return;
 
-		const time = BigInt(command.time);
-		const at =
-			command.kind === 'duration'
-				? { duration_nanos: time }
-				: command.kind === 'timestamp'
-					? { timestamp_nanos: time }
-					: { sequence: time };
-
-		pending_command_id = command.id;
+		sent_command_id = command.id;
 		try {
+			const time = BigInt(command.time);
 			await rr.set_time({
-				...(command.timeline === null ? {} : { timeline: command.timeline }),
-				...at,
+				timeline: command.timeline ?? undefined,
+				...(command.kind === 'duration'
+					? { duration_nanos: time }
+					: command.kind === 'timestamp'
+						? { timestamp_nanos: time }
+						: { sequence: time }),
 				play_state: command.play ? 'playing' : 'paused'
 			});
-			last_command_id = command.id;
 		} catch (error) {
-			console.debug('Rerun time command not applied yet:', error);
-		} finally {
-			pending_command_id = null;
+			if (sent_command_id === command.id) sent_command_id = null;
+			if (warned_command_id !== command.id) {
+				warned_command_id = command.id;
+				console.warn(
+					'Rerun time command not applied yet, retrying on the next viewer event:',
+					error
+				);
+			}
 		}
 	}
 
@@ -240,10 +240,8 @@
 	});
 
 	$effect(() => {
-		const command = gradio.props._command;
-		if (command != null && command.id !== last_command_id) {
-			try_apply_command();
-		}
+		void gradio.props._command;
+		try_apply_command();
 	});
 
 	// Watch for panel_states changes
