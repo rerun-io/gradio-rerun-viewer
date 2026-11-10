@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from inspect import signature
 
 from gradio_rerun import Rerun
@@ -25,19 +25,19 @@ class SetTimeTest(unittest.TestCase):
 
         self.assertEqual(command["type"], "time_ctrl")
         self.assertEqual(command["timeline"], None)
-        self.assertEqual(command["time"], 42)
+        self.assertEqual(command["time"], "42")
         self.assertEqual(command["play"], False)
         self.assertIsInstance(command["id"], str)
 
     def test_temporal_values_are_converted_to_nanoseconds(self) -> None:
         duration = self.command(set_time("elapsed", duration=1.5, play=True))
         timestamp = self.command(
-            set_time("capture_time", timestamp=datetime(1970, 1, 1, tzinfo=timezone.utc)),
+            set_time("capture_time", timestamp=datetime(1970, 1, 1, tzinfo=UTC)),
         )
 
-        self.assertEqual(duration["time"], 1_500_000_000)
+        self.assertEqual(duration["time"], "1500000000")
         self.assertTrue(duration["play"])
-        self.assertEqual(timestamp["time"], 0)
+        self.assertEqual(timestamp["time"], "0")
 
     def test_exactly_one_time_value_is_required(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly one"):

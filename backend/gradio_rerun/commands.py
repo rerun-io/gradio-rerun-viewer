@@ -20,7 +20,8 @@ class _TimeControlCommand(TypedDict):
     id: str
     type: Literal["time_ctrl"]
     timeline: str | None
-    time: int
+    kind: Literal["sequence", "duration", "timestamp"]
+    time: str
     play: bool
 
 
@@ -84,19 +85,22 @@ def set_time(
     if sum(value is not None for value in (sequence, duration, timestamp)) != 1:
         raise ValueError("set_time expects exactly one of sequence, duration, or timestamp")
 
+    kind: Literal["sequence", "duration", "timestamp"]
     if sequence is not None:
-        time: int = sequence
+        kind, time = "sequence", sequence
     elif duration is not None:
-        time = to_nanos(duration)
+        kind, time = "duration", to_nanos(duration)
     else:
         assert timestamp is not None
-        time = to_nanos_since_epoch(timestamp)
+        kind, time = "timestamp", to_nanos_since_epoch(timestamp)
 
     command: _TimeControlCommand = _TimeControlCommand(
         id=uuid4().hex,
         type="time_ctrl",
         timeline=timeline,
-        time=time,
+        kind=kind,
+        # A string, because nanosecond timestamps exceed JavaScript's safe-integer range.
+        time=str(time),
         play=play,
     )
     return cast("_SetTimeUpdate", gradio_update(_command=command))

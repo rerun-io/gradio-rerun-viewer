@@ -22,7 +22,8 @@
 		id: string;
 		type: 'time_ctrl';
 		timeline: string | null;
-		time: number;
+		kind: 'sequence' | 'duration' | 'timestamp';
+		time: string;
 		play: boolean;
 	}
 
@@ -149,35 +150,42 @@
 		rr.open(value.url);
 	}
 
-	function try_apply_command() {
+	let pending_command_id: string | null = null;
+
+	/**
+	 * Apply the latest time-control command once the viewer has a recording.
+	 *
+	 * `WebViewer.set_time` sets the timeline, play state, and cursor in one operation.
+	 * It rejects while the requested timeline does not exist yet; the next
+	 * `recording_open`, `timeline_change`, or `time_update` event retries.
+	 */
+	async function try_apply_command() {
 		const command = gradio.props._command;
-		if (command == null || command.type !== 'time_ctrl' || command.id === last_command_id) {
-			return;
+		if (command == null || command.type !== 'time_ctrl') return;
+		if (command.id === last_command_id || command.id === pending_command_id) return;
+		if (rr === undefined || !rr.ready || rr.get_active_recording_id() === null) return;
+
+		const time = BigInt(command.time);
+		const at =
+			command.kind === 'duration'
+				? { duration_nanos: time }
+				: command.kind === 'timestamp'
+					? { timestamp_nanos: time }
+					: { sequence: time };
+
+		pending_command_id = command.id;
+		try {
+			await rr.set_time({
+				...(command.timeline === null ? {} : { timeline: command.timeline }),
+				...at,
+				play_state: command.play ? 'playing' : 'paused'
+			});
+			last_command_id = command.id;
+		} catch (error) {
+			console.debug('Rerun time command not applied yet:', error);
+		} finally {
+			pending_command_id = null;
 		}
-
-		if (rr === undefined || !rr.ready) {
-			return;
-		}
-
-		const recording_id = rr.get_active_recording_id();
-		if (recording_id === null) {
-			return;
-		}
-
-		const active_timeline = rr.get_active_timeline(recording_id);
-		if (command.timeline !== null && command.timeline !== active_timeline) {
-			rr.set_active_timeline(recording_id, command.timeline);
-		}
-
-		const timeline = rr.get_active_timeline(recording_id);
-		if (timeline === null || (command.timeline !== null && timeline !== command.timeline)) {
-			return;
-		}
-
-		last_command_id = command.id;
-
-		rr.set_playing(recording_id, command.play);
-		rr.set_current_time(recording_id, timeline, command.time);
 	}
 
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
@@ -206,6 +214,7 @@
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
 		rr.on('recording_open', () => try_apply_command());
 		rr.on('timeline_change', () => try_apply_command());
+		rr.on('time_update', () => try_apply_command());
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
