@@ -545,7 +545,7 @@ The code snippet below is accurate in cases where the component is used as both 
  ```python
  def predict(
      value: RerunData | None
- ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes:
+ ) -> list[pathlib.Path | str] | pathlib.Path | str | bytes | None:
      return value
  ```
  

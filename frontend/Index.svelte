@@ -18,6 +18,15 @@
 		is_stream: boolean;
 	}
 
+	interface TimeControlCommand {
+		id: string;
+		type: 'time_ctrl';
+		timeline: string | null;
+		kind: 'sequence' | 'duration' | 'timestamp';
+		time: string;
+		play: boolean;
+	}
+
 	interface RerunEvents {
 		change: never;
 		upload: never;
@@ -32,6 +41,7 @@
 		height: number | string;
 		streaming: boolean;
 		panel_states: { [K in Panel]: PanelState } | null;
+		_command: TimeControlCommand | null | undefined;
 	}
 
 	class RerunGradio extends Gradio<RerunEvents, RerunProps> {}
@@ -139,6 +149,45 @@
 		rr.open(value.url);
 	}
 
+	/** The command that is applied or in flight; a newer command replaces it. */
+	let sent_command_id: string | null = null;
+	let warned_command_id: string | null = null;
+
+	/**
+	 * Apply the latest time-control command through `WebViewer.set_time`, which sets
+	 * the timeline, play state, and cursor in one operation.
+	 *
+	 * It rejects while no recording is open or the timeline does not exist yet;
+	 * the next viewer event (`recording_open`, `timeline_change`, `time_update`) retries.
+	 */
+	async function try_apply_command() {
+		const command = gradio.props._command;
+		if (command?.type !== 'time_ctrl' || command.id === sent_command_id || !rr?.ready) return;
+
+		sent_command_id = command.id;
+		try {
+			const time = BigInt(command.time);
+			await rr.set_time({
+				timeline: command.timeline ?? undefined,
+				...(command.kind === 'duration'
+					? { duration_nanos: time }
+					: command.kind === 'timestamp'
+						? { timestamp_nanos: time }
+						: { sequence: time }),
+				play_state: command.play ? 'playing' : 'paused'
+			});
+		} catch (error) {
+			if (sent_command_id === command.id) sent_command_id = null;
+			if (warned_command_id !== command.id) {
+				warned_command_id = command.id;
+				console.warn(
+					'Rerun time command not applied yet, retrying on the next viewer event:',
+					error
+				);
+			}
+		}
+	}
+
 	const is_panel = (v: string): v is Panel => ['top', 'blueprint', 'selection', 'time'].includes(v);
 
 	function setup_panels(panel_states: RerunProps['panel_states'] = gradio.props.panel_states) {
@@ -157,11 +206,15 @@
 			console.log('Rerun viewer ready');
 			channel = rr.open_channel('gradio');
 			try_load_value();
+			try_apply_command();
 			setup_panels();
 			// Clear loading status when viewer is ready
 			gradio.dispatch('clear_status', gradio.shared.loading_status);
 		});
 		rr.on('fullscreen', (on) => rr.toggle_panel_overrides(!on));
+		rr.on('recording_open', () => try_apply_command());
+		rr.on('timeline_change', () => try_apply_command());
+		rr.on('time_update', () => try_apply_command());
 
 		rr._on_raw_event((event: string) => {
 			const { type } = JSON.parse(event);
@@ -184,6 +237,11 @@
 	$effect(() => {
 		const value = gradio.props.value;
 		try_load_value(value);
+	});
+
+	$effect(() => {
+		void gradio.props._command;
+		try_apply_command();
 	});
 
 	// Watch for panel_states changes
