@@ -718,7 +718,7 @@ requires-dist = [
     { name = "gradio", specifier = ">=6.0.0" },
     { name = "opencv-python" },
     { name = "opencv-python", marker = "extra == 'dev'", specifier = ">=4.10.0" },
-    { name = "rerun-sdk", specifier = "==0.43.0" },
+    { name = "rerun-sdk", specifier = "==0.43.1" },
     { name = "twine", specifier = ">=6.1.0" },
     { name = "twine", marker = "extra == 'dev'" },
 ]
@@ -2215,7 +2215,7 @@ wheels = [
 
 [[package]]
 name = "rerun-sdk"
-version = "0.43.0"
+version = "0.43.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -2227,10 +2227,10 @@ dependencies = [
     { name = "typing-extensions" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/7d/5746743925ecdaaa1cd65e80a80b265fc1fef60d5a55f1cbc1ed73515141/rerun_sdk-0.43.0-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:2487d38ced021d38d1541061761b5a76c8da891286a1982142837f917a9e719b", size = 157151633, upload-time = "2026-11-11T14:19:30.461Z" },
-    { url = "https://files.pythonhosted.org/packages/c4/4c/9bd1d9a1db89d5ae48eca9f0fe8011af9b99de34409d63524fe6933ba0c5/rerun_sdk-0.43.0-cp311-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:5aa29dcba7c574c44e07e81372839150fad2ee94ee56444a70edefa0f2dc1559", size = 170251149, upload-time = "2026-11-11T14:19:39.865Z" },
-    { url = "https://files.pythonhosted.org/packages/3e/7c/78b5c5828074ae0bdc76bc66e1796b52bfdd37c87b67e777f9e6357c8bf2/rerun_sdk-0.43.0-cp311-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:b162b02b0f1b3e174a71e51a49634db70f7119ea8f1770ef312d4dcfd07a690f", size = 174982274, upload-time = "2026-11-11T14:19:48.339Z" },
-    { url = "https://files.pythonhosted.org/packages/b5/cd/05f4e7c107c74387f6fbe638e153b59f276a212b9f48439b94e35cfd2372/rerun_sdk-0.43.0-cp311-abi3-win_amd64.whl", hash = "sha256:52659f7d8be1b87822b1ab31cbcef7b0595ebd257627767157f238413f141a78", size = 152529563, upload-time = "2026-11-11T14:19:57.854Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/d5/d8d65a0a0c8694fcabe624a85525910cea07e4c83d8aef4c6de3c22cc338/rerun_sdk-0.43.1-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:dd3f21ffb749fa90bb547e50453737bda817d1b1d29cff3969ae26bf27e508c1", size = 157210064, upload-time = "2026-11-11T21:48:24.151Z" },
+    { url = "https://files.pythonhosted.org/packages/87/f0/7b4e9fb08d9b04d622085b65d7cae3950d34ca59d607f808fe40886e901c/rerun_sdk-0.43.1-cp311-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:441280a62bd1b6ce8b016c6e7f4f482cd7ae841cd0a9535dba3225a609e5b7b4", size = 170332928, upload-time = "2026-11-11T21:48:30.843Z" },
+    { url = "https://files.pythonhosted.org/packages/42/9b/18f1481c2fa0ed5afce641441807f19a98ad977f601a6aa33b54c9c0e469/rerun_sdk-0.43.1-cp311-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:76e2ee78cead2b206d5ca3b49c9c7e7ba899e832708ab1d8968ed484f2a40f6b", size = 175077198, upload-time = "2026-11-11T21:48:38.818Z" },
+    { url = "https://files.pythonhosted.org/packages/9d/d7/97625f3b589d5f8c1c1bdf89eddc98b288502683a2cb3e85739d7fd30b1e/rerun_sdk-0.43.1-cp311-abi3-win_amd64.whl", hash = "sha256:9a9e4dd45cd955800bced90d79b54774a7f5b589f1882ff6580458773f2083c2", size = 152610427, upload-time = "2026-11-11T21:48:46.018Z" },
 ]
 
 [[package]]
